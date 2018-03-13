@@ -18,19 +18,165 @@ IRcodeTextDataSet* IRcodeData::getIRcodeTextDataSet(){
 }
 
 
+std::unique_ptr<Module>* IRcodeData::getIRmodule()
+{
+	return IRmodule;
+}
+
+
+
+GlobalVariableList& IRcodeData::getGlobalVariableList()
+{
+	return m_gvl; 
+}
+
+StaticVariableList& IRcodeData::getStaticVariableList()
+{
+	return m_svl; 
+}
+
+FunctionList& IRcodeData::getFunctionList()
+{
+	return m_fl;
+}
+
+
+
+bool IRcodeData::setFunctionList()
+{
+	std::ofstream fout;
+	fout.open("FunctionList", std::ofstream::out);
+
+	for(auto iter = (*IRmodule)->begin();
+			iter != (*IRmodule)->end(); iter++)
+	{
+	
+		llvm::Function& f = (*iter);
+		m_fl.push_back(&f);
+
+		fout << f.getName().str() << std::endl;
+	}
+
+	fout.close();
+
+	return true;
+}
+
+
+bool IRcodeData::setGlobalVariableList()
+{
+	std::ofstream fout;
+	fout.open("GlobalVariableList", std::ofstream::out);
+
+	bool StaticVarFlag = false;
+
+	for(auto iter1 = (*IRmodule)->global_begin();
+			iter1 != (*IRmodule)->global_end(); iter1++)
+	{
+
+		StaticVarFlag = false;
+		GlobalVariable& gvl = (*iter1);
+		
+		for(auto iter2 = m_fl.begin();
+				iter2 != m_fl.end(); iter2++)
+		{
+
+			Function* f = (*iter2);
+			
+			std::string gv_name = std::string(gvl.getName().str());
+			std::string token = gv_name.substr(0, gv_name.find("."));
+
+			if(token == f->getName().str())
+			{
+				StaticVarFlag = true;
+			}
+
+		}
+
+		if(StaticVarFlag == false)
+		{
+			m_gvl.push_back(&gvl);
+			fout << gvl.getName().str() << std::endl;
+		}
+	}
+
+	fout.close();
+
+	return true;
+}
+
+
+
+
+bool IRcodeData::setStaticVariableList()
+{
+	std::ofstream fout;
+	fout.open("StaticVariableList", std::ofstream::out);
+
+	for(auto iter1 = (*IRmodule)->global_begin();
+			iter1 != (*IRmodule)->global_end(); iter1++)
+	{
+
+		for(auto iter2 = m_fl.begin();
+				iter2 != m_fl.end(); iter2++)
+		{
+
+			GlobalVariable& gvl = (*iter1);
+			Function* f = (*iter2);
+			
+			std::string gv_name = std::string(gvl.getName().str());
+			std::string token = gv_name.substr(0, gv_name.find("."));
+
+			if(token == f->getName().str())
+			{
+
+				m_svl.push_back(&gvl);
+				fout << gvl.getName().str() << std::endl;
+			}
+			
+		}
+
+	}
+
+	fout.close();
+
+	return true;
+}
 
 void IRcodeData::ShowGlobalVariables(std::unique_ptr<Module> &m){
 	
+	std::ofstream fout;
+	fout.open("AnalysisGlobalVariables", std::ofstream::out);
+	
 	int number = 1;
+	
 	std::cout << "[Show Global Variable]" << std::endl;
 	for(auto iter = m->global_begin(); iter != m->global_end(); iter++){
 
 		GlobalVariable &gv = (*iter);
-		std::cout << number++ << ". " << gv.getName().str() << std::endl;
+
+		/*
+		if(gv.getType()->isIntegerTy()) 
+			fout << "int ";
+		else if(gv.getType()->isDoubleTy()) 
+			fout << "double ";
+		else if(gv.getType()->isVoidTy()) 
+			fout << "void ";	
+		else if(gv.getType()->isHalfTy()) 
+			fout << "half ";	
+		else if(gv.getType()->isFloatTy()) 
+			fout << "float ";	
+		else if(gv.getType()->isPointerTy()) 
+			fout << "PointerTy ";
+		else 
+			fout << "Unknwon Type ";
+		*/
+		std::cout << gv.getName().str() << std::endl;
+		fout << gv.getName().str() << std::endl;
 
 	}
 	std::cout << std::endl;
-
+	fout.close();
 }
 
 
@@ -286,6 +432,34 @@ bool IRcodeData::ShowPathsInEachFunc(){
 	return true;
 }
 
+
+bool IRcodeData::Preprocess0()
+{
+
+	/* should follow this order */
+	setFunctionList();
+	setStaticVariableList();
+	setGlobalVariableList();
+
+
+	std::list<wFunction *>::iterator iter1;
+	for(iter1 = wtask->getwFuncList()->begin(); 
+			iter1 != wtask->getwFuncList()->end(); iter1++)
+	{
+
+		wFunction *CurrentFunc = (*iter1);
+		//CurrentFunc->detectGlobalVariables();
+		CurrentFunc->FindStaticVariable();
+		CurrentFunc->FindGlobalVariable();
+		CurrentFunc->showStaticVariable();
+		CurrentFunc->showGlobalVariable();
+	}
+
+	return true;
+}
+
+
+
 bool IRcodeData::Preprocess2(){
 
 	std::unique_ptr<Module> &m = *IRmodule;
@@ -295,7 +469,7 @@ bool IRcodeData::Preprocess2(){
 
 		/* Function Entry */
 		Function &f = *iter1;
-		wFunction *wf = new wFunction;
+		wFunction *wf = new wFunction(IRmodule, this);
 		wf->setwFunction(&f);
 		wtask->pushFuncList(wf);
 

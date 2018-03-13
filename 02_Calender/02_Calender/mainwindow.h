@@ -104,11 +104,21 @@ private:
     QString AnalysisResultFileName;
     QFile AnalysisResultFile;
 
+    QGroupBox *codeAnalysisResultBox3;
+    QGridLayout *AnalysisLayout3;
+
     QGroupBox *codeAnalysisPathBox;
     QGridLayout *AnalysisPathLayout;
     QTextEdit *AnalysisPathViewer;
     QString AnalysisPathFileName;
     QFile AnalysisPathFile;
+
+    QGroupBox *codeAnalysisGlobalVariablesBox;
+    QGridLayout *AnalysisGlobalVariablesLayout;
+    QTextEdit *AnalysisGlobalVariablesViewer;
+    QString AnalysisGlobalVariablesFileName;
+    QFile AnalysisGlobalVariablesFile;
+
 
     QLabel* analysisGraphLabel;
     QPixmap analysisGraph;

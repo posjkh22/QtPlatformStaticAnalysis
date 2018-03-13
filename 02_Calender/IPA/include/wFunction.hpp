@@ -11,12 +11,21 @@
 #include <llvm/Bitcode/BitcodeWriter.h>
 #include "wBasicBlock.hpp"
 #include "Path.hpp"
+#include "IRcodeData.hpp"
+
 
 using namespace llvm;
 
+typedef std::unique_ptr<Module> IRmodule; 
+
+typedef std::list<llvm::GlobalVariable* > GlobalVariableList;
+typedef std::list<llvm::GlobalVariable* > StaticVariableList;
+
+typedef std::list<wBasicBlock* > PathTy;
+
 class Path;
-class wFunction;
-class wBasicBlock;
+class IRcodeData;
+
 
 class wFunction 
 {
@@ -36,10 +45,30 @@ private:
 	std::list<std::list<wBasicBlock *> *> PathsList;
 	std::list<Path *> PATHSLIST;
 
+private:
+	GlobalVariableList m_gvl;
+	StaticVariableList m_svl;
+	IRmodule* m_IRmodule; 
+
+public:
+	GlobalVariableList& getGlobalVariableList();
+	StaticVariableList& getStaticVariableList();
+
+	/* preprocessing */
+	bool detectGlobalVariables();
+	
+	bool showGlobalVariable();
+	bool showStaticVariable();
+	bool FindStaticVariable();
+	bool FindGlobalVariable();
+
+private:
+	IRcodeData* m_IRcodeData;
+
 public:
 
 
-	wFunction();
+	wFunction(IRmodule* , IRcodeData* );
 
 	bool determineFuncRetTy();
 	bool setFuncRetTy(wFunction::FuncRetTy);

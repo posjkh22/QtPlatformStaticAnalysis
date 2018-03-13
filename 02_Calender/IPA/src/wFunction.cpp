@@ -3,8 +3,305 @@
 ///////////////* wFunction */////////////
 
 
-wFunction::wFunction(){
+
+
+GlobalVariableList& wFunction::getGlobalVariableList()
+{
+	return m_gvl; 
+}
+
+StaticVariableList& wFunction::getStaticVariableList()
+{
+	return m_svl; 
+}
+
+bool wFunction::showGlobalVariable()
+{
+	
+	std::ofstream fout;
+	fout.open("AnalysisFuncGlobalVariables", std::ofstream::out | std::ofstream::app);
+	
+	fout << this->getFunction()->getName().str() << ":" <<  std::endl; 
+
+	if(m_gvl.empty())
+	{
+		fout << "No Global Variables" <<  std::endl; 
+		fout.close();
+		return true;
+	}
+
+	for(auto iter = m_gvl.begin(); 
+			iter != m_gvl.end(); iter++)
+	{
+		GlobalVariable* gv = *iter;
+		fout << gv->getName().str() << std::endl;
+		
+	}
+
+	fout.close();
+
+	return true;
+}
+
+bool wFunction::showStaticVariable()
+{
+	
+	std::ofstream fout;
+	fout.open("AnalysisFuncStaticVariables", std::ofstream::out | std::ofstream::app);
+	
+	fout << this->getFunction()->getName().str() << ":" <<  std::endl; 
+
+	if(m_svl.empty())
+	{
+		fout << "No Static Variables" <<  std::endl; 
+		fout.close();
+		return true;
+	}
+
+	for(auto iter = m_svl.begin(); 
+			iter != m_svl.end(); iter++)
+	{
+		GlobalVariable* sv = *iter;
+		fout << sv->getName().str() << std::endl;
+		
+	}
+
+	fout.close();
+
+	return true;
+}
+
+
+
+
+
+bool wFunction::FindGlobalVariable()
+{
+	for(auto iter1 = PathsList.begin();
+			iter1 != PathsList.end(); iter1++)
+	{
+		PathTy* current_path = (*iter1);
+		
+		for(auto iter2 = current_path->begin(); 
+				iter2 != current_path->end(); iter2++){
+
+			wBasicBlock* wbb = *iter2;
+			
+			for(auto iter3 = wbb->getwInstList()->begin();
+				iter3 != wbb->getwInstList()->end(); iter3++)
+			{
+				wInstruction* wInst = (*iter3);
+				Instruction* inst = (wInst->getInstruction());
+				
+				#define LOAD_INSTRUCTION_LOADED_VALUE 0
+				if(!strcmp(inst->getOpcodeName(), "load"))
+				{
+					llvm::Value* loaded_value
+					= inst->getOperand(LOAD_INSTRUCTION_LOADED_VALUE);
+
+
+				
+
+					for(auto iter4 = m_IRcodeData->getGlobalVariableList().begin();
+							iter4 != m_IRcodeData->getGlobalVariableList().end(); iter4++)
+					{
+						GlobalVariable* gv = (*iter4);
+						
+						if( (reinterpret_cast<GlobalVariable* >(loaded_value)) == gv)
+						{
+							m_gvl.push_back(gv);
+						}
+					}	
+
+				}
+				#undef LOAD_INSTRUCTION_LOADDED_VALUE
+	
+				#define LOAD_INSTRUCTION_STORED_VALUE 1
+				if(!strcmp(inst->getOpcodeName(), "store"))
+				{
+					llvm::Value* stored_value
+					= inst->getOperand(LOAD_INSTRUCTION_STORED_VALUE);
+
+
+					for(auto iter4 = m_IRcodeData->getGlobalVariableList().begin();
+							iter4 != m_IRcodeData->getGlobalVariableList().end(); iter4++)
+					{
+						GlobalVariable* gv = (*iter4);
+						
+						if( (reinterpret_cast<GlobalVariable* >(stored_value)) == gv)
+						{
+							m_gvl.push_back(gv);
+						}
+					}	
+
+				}
+				#undef LOAD_INSTRUCTION_STORED_VALUE
+	
+
+			}
+
+		}
+	}
+
+
+	return true;
+}
+
+bool wFunction::FindStaticVariable()
+{
+	for(auto iter1 = PathsList.begin();
+			iter1 != PathsList.end(); iter1++)
+	{
+		PathTy* current_path = (*iter1);
+		
+		for(auto iter2 = current_path->begin(); 
+				iter2 != current_path->end(); iter2++){
+
+			wBasicBlock* wbb = *iter2;
+			
+			for(auto iter3 = wbb->getwInstList()->begin();
+				iter3 != wbb->getwInstList()->end(); iter3++)
+			{
+				wInstruction* wInst = (*iter3);
+				Instruction* inst = (wInst->getInstruction());
+				
+				#define LOAD_INSTRUCTION_LOADED_VALUE 0
+				if(!strcmp(inst->getOpcodeName(), "load"))
+				{
+					llvm::Value* loaded_value
+					= inst->getOperand(LOAD_INSTRUCTION_LOADED_VALUE);
+
+
+				
+
+					for(auto iter4 = m_IRcodeData->getStaticVariableList().begin();
+							iter4 != m_IRcodeData->getStaticVariableList().end(); iter4++)
+					{
+						GlobalVariable* gv = (*iter4);
+						
+						if( (reinterpret_cast<GlobalVariable* >(loaded_value)) == gv)
+						{
+							m_svl.push_back(gv);
+						}
+					}	
+
+				}
+				#undef LOAD_INSTRUCTION_LOADDED_VALUE
+	
+				#define LOAD_INSTRUCTION_STORED_VALUE 1
+				if(!strcmp(inst->getOpcodeName(), "store"))
+				{
+					llvm::Value* stored_value
+					= inst->getOperand(LOAD_INSTRUCTION_STORED_VALUE);
+
+
+					for(auto iter4 = m_IRcodeData->getStaticVariableList().begin();
+							iter4 != m_IRcodeData->getStaticVariableList().end(); iter4++)
+					{
+						GlobalVariable* gv = (*iter4);
+						
+						if( (reinterpret_cast<GlobalVariable* >(stored_value)) == gv)
+						{
+							m_svl.push_back(gv);
+						}
+					}	
+
+				}
+				#undef LOAD_INSTRUCTION_STORED_VALUE
+	
+
+			}
+
+		}
+	}
+
+
+	return true;
+}
+
+
+
+bool wFunction::detectGlobalVariables()
+{
+
+	std::unique_ptr<Module>& m = *(m_IRmodule);
+	
+
+	std::list<wBasicBlock *> *current_cfg;
+	std::list<std::list<wBasicBlock *> *>::iterator iter1;
+	std::list<wBasicBlock *>::iterator iter2;
+	std::list<wInstruction *>::iterator iter3;
+
+	for(iter1 = PathsList.begin(); iter1 != PathsList.end(); iter1++){
+		current_cfg = (*iter1);
+		
+		for(iter2 = current_cfg->begin(); iter2 != current_cfg->end(); iter2++){
+
+			wBasicBlock* wbb = *iter2;
+			
+			for(iter3 = wbb->getwInstList()->begin();
+				iter3 != wbb->getwInstList()->end(); iter3++)
+			{
+				wInstruction* wInst = *iter3;
+				Instruction* inst = (wInst->getInstruction());
+				
+				#define LOAD_INSTRUCTION_LOADED_VALUE 0
+				if(!strcmp(inst->getOpcodeName(), "load"))
+				{
+					llvm::Value* loaded_value
+					= inst->getOperand(LOAD_INSTRUCTION_LOADED_VALUE);
+
+
+					for(auto iter = m->global_begin(); iter != m->global_end(); iter++)
+					{
+						GlobalVariable &gv = (*iter);
+						
+						if( (reinterpret_cast<GlobalVariable* >(loaded_value)) == &gv)
+						{
+							m_gvl.push_back(reinterpret_cast<GlobalVariable* >(loaded_value));
+						}
+					}	
+
+				}
+				#undef LOAD_INSTRUCTION_LOADDED_VALUE
+	
+				#define LOAD_INSTRUCTION_STORED_VALUE 1
+				if(!strcmp(inst->getOpcodeName(), "store"))
+				{
+					llvm::Value* stored_value
+					= inst->getOperand(LOAD_INSTRUCTION_STORED_VALUE);
+
+
+					for(auto iter = m->global_begin(); iter != m->global_end(); iter++)
+					{
+						GlobalVariable &gv = (*iter);
+						
+						if( (reinterpret_cast<GlobalVariable* >(stored_value)) == &gv)
+						{
+							m_gvl.push_back(reinterpret_cast<GlobalVariable* >(stored_value));
+						}
+					}	
+
+				}
+				#undef LOAD_INSTRUCTION_STORED_VALUE
+	
+
+			}
+
+		}
+	}
+
+
+
+
+	return true;
+}
+
+wFunction::wFunction(IRmodule* module,  IRcodeData* IRcode){
+	m_IRmodule = module;
+	m_IRcodeData = IRcode;
 	makePATHSLIST();
+
 }
 
 bool wFunction::determineFuncRetTy(){

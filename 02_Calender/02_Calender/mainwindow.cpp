@@ -35,7 +35,7 @@ Window::Window()
 
     UpperLayout->addWidget(codeViewerBox, 0, 0);
     UpperLayout->addWidget(codeAnalysisBox, 0, 1);
-    UpperLayout->addWidget(AnalysisResultBox, 0, 2);
+    UpperLayout->addWidget(codeAnalysisResultBox3, 0, 2);
 
     LowerLayout->addWidget(codeAnalysisPathBox, 0, 0);
 
@@ -243,23 +243,28 @@ void Window::reformatCalendarPage()
 
 void Window::createAnalysisPathGroupBox()
 {
+
+
+
+    // AnalysisPathViewer //
     codeAnalysisPathBox = new QGroupBox(tr("Analysis Path"));
-
     AnalysisPathLayout = new QGridLayout;
+    AnalysisPathViewer = new QTextEdit();
 
+
+
+
+
+    // AnalysisPathViewer //
     AnalysisPathViewer = new QTextEdit();
     const QSize ANALYSIS_PATH_FIXED_SIZE = QSize(1150, 100);
     AnalysisPathViewer->setFixedSize(ANALYSIS_PATH_FIXED_SIZE);
     const QSize ANALYSIS_PATH_MAX_SIZE = QSize(1150, 100);
     AnalysisPathViewer->setMaximumSize(ANALYSIS_PATH_MAX_SIZE);
 
-
     AnalysisPathViewer->clear();
     AnalysisPathLayout->addWidget(AnalysisPathViewer, 0, 0, Qt::AlignCenter);
-
     codeAnalysisPathBox->setLayout(AnalysisPathLayout);
-
-
 
     // View Analysis Results //
     AnalysisPathFileName = QString("AnalysisPaths");
@@ -282,10 +287,27 @@ void Window::createAnalysisPathGroupBox()
     {
         qDebug() << AnalysisResultFileName << " open";
     }
+
+
+
+
+
+
+
+    AnalysisPathLayout->addWidget(AnalysisPathViewer, 0, 0, Qt::AlignCenter);
+    codeAnalysisPathBox->setLayout(AnalysisPathLayout);
+
+
 }
 
 void Window::createAnalysisResultGroupBox()
 {
+
+    codeAnalysisResultBox3 = new QGroupBox();
+    AnalysisLayout3 = new QGridLayout;
+
+
+    // 1.
     AnalysisResultBox = new QGroupBox(tr("Analysis Result"));
     AnalysisResultLayout = new QGridLayout;
     //AnalysisResultFile = new QFile();
@@ -300,15 +322,11 @@ void Window::createAnalysisResultGroupBox()
 
     AnalysisResultViewer->clear();
 
-    const QSize ANALYSIS_RESULTS_SIZE = QSize(300, 550);
+    const QSize ANALYSIS_RESULTS_SIZE = QSize(300, 350);
     AnalysisResultViewer->setFixedSize(ANALYSIS_RESULTS_SIZE);
 
     AnalysisResultLayout->addWidget(AnalysisResultViewer, 2, 0, Qt::AlignCenter);
     AnalysisResultBox->setLayout(AnalysisResultLayout);
-
-
-
-
 
     // View Analysis Results //
     AnalysisResultFileName = QString("AnalysisResults");
@@ -331,6 +349,53 @@ void Window::createAnalysisResultGroupBox()
     {
         qDebug() << AnalysisResultFileName << " open";
     }
+
+
+
+    // 2.
+
+    // AnalysisVariablesViewer //
+    codeAnalysisGlobalVariablesBox = new QGroupBox(tr("Global Variables"));
+    AnalysisGlobalVariablesLayout = new QGridLayout;
+    AnalysisGlobalVariablesViewer = new QTextEdit();
+
+    // AnalysisGlobalVariablesViewer //
+    AnalysisGlobalVariablesViewer = new QTextEdit();
+    const QSize ANALYSIS_GVAR_SIZE = QSize(300, 200);
+    AnalysisGlobalVariablesViewer->setFixedSize(ANALYSIS_GVAR_SIZE);
+
+
+    AnalysisGlobalVariablesViewer->clear();
+    AnalysisGlobalVariablesLayout->addWidget(AnalysisGlobalVariablesViewer, 0, 0, Qt::AlignCenter);
+    codeAnalysisGlobalVariablesBox->setLayout(AnalysisGlobalVariablesLayout);
+
+    // View Analysis GlobalVariables //
+    AnalysisGlobalVariablesFileName = QString("AnalysisGlobalVariables");
+
+    if(!AnalysisGlobalVariablesFileName.isNull())
+    {
+        system("echo 'ERROR:Improper Analysis Setting' >> AnalysisPaths" );
+        qDebug() << "selected file path: " << AnalysisGlobalVariablesFileName.toUtf8();
+    }
+
+    // View source Code //
+    AnalysisGlobalVariablesViewer->clear();
+    AnalysisGlobalVariablesFile.setFileName(AnalysisGlobalVariablesFileName);
+
+    if(!AnalysisGlobalVariablesFile.exists())
+    {
+        qDebug() << "No exists file: " << AnalysisGlobalVariablesFileName;
+    }
+    else
+    {
+        qDebug() << AnalysisResultFileName << " open";
+    }
+
+
+    // Summary //
+    AnalysisLayout3->addWidget(AnalysisResultBox, 0, 0, Qt::AlignCenter);
+    AnalysisLayout3->addWidget(codeAnalysisGlobalVariablesBox, 1, 0, Qt::AlignCenter);
+    codeAnalysisResultBox3->setLayout(AnalysisLayout3);
 
 }
 
@@ -422,6 +487,27 @@ void Window::handleAnalysis()
 
     // Reset AnalysisPathFile
     system("rm -f AnalysisPaths");
+
+
+    // View Analysis Paths //
+    AnalysisGlobalVariablesViewer->clear();
+
+    QString global_variable_line;
+    if(AnalysisGlobalVariablesFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        QTextStream stream(&AnalysisGlobalVariablesFile);
+        while(!stream.atEnd())
+        {
+            global_variable_line = stream.readLine();
+            AnalysisGlobalVariablesViewer->setText(AnalysisGlobalVariablesViewer->toPlainText()+global_variable_line+"\n");
+            qDebug() << "line: " << global_variable_line;
+        }
+    }
+    AnalysisGlobalVariablesFile.close();
+
+    // Reset AnalysisPathFile
+    system("rm -f AnalysisGlobalVariables");
+
 
 
     // View Analysis Graph //
@@ -590,7 +676,7 @@ void Window::handleCodeViewer()
 
     parsedBitcodeSourceFileNameList = parsedsourceFileName.split(".");
     parsedBitcodeSourceFileName = parsedBitcodeSourceFileNameList.at(0) + ".bc";
-    QString CLANG_PATH("/home/posjkh/LLVM/llvm-ubuntu-linux-5.0/bin/");
+    QString CLANG_PATH("/home/posjkh22/LLVM/llvm-ubuntu-linux-5.0.0/bin/");
 
     QString file = CLANG_PATH + "clang -g -S -emit-llvm -o " + QDir::currentPath() + "/" + parsedBitcodeSourceFileName
             + " " + QDir::currentPath() + "/" +  parsedsourceFileName;

@@ -3,8 +3,8 @@ SRC				=./src
 LIB				=./lib
 INCLUDE			=./include
 TESTCASE		= ./TestCases
-TESTCLASS 		= testcase7
-TEST			= testcase7-11
+TESTCLASS 		= testcase8
+TEST			= testcase8-1
 TARGET_OPTION 	= --target=Linux
 THREAD_OPTION1	= --thread=Unithread
 THREAD_OPTION2	= --thread=Multithread
@@ -128,3 +128,7 @@ BugReport:
 
 clean:
 	rm -f $(OUTPUT) test_out $(LIB)/*.o Analysis*
+
+result_clean:
+	rm -f Analysis*
+

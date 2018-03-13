@@ -1,6 +1,12 @@
 #include <stdlib.h>
 #include <pthread.h>
 
+char charGlobal1;
+int IntegerGlobalVariable = 3;
+double DoubleGlobalVariable= 3.5;
+int *IntegerPointerGV;
+char charGlobal2;
+
 void t1_fnc1(int *ptr1){
 
 	free(ptr1);

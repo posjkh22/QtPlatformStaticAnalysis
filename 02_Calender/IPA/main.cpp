@@ -68,15 +68,17 @@ int main(int argc, char *argv[]) {
 	IRcodeData IRcode(m);
 
 	/* Global Variable */
-/*
+
 	IRcode.ShowGlobalVariables(m);
-*/
+
 	comp_gv = IRcode.popGlobalVariable(m, 0);
 
 	/* Function */
 	IRcode.Preprocess1();
 	IRcode.Preprocess2();
 	IRcode.Preprocess3();
+	
+	IRcode.Preprocess0();
 	
 /*
 	IRcode.DebugWrapperModule();	
