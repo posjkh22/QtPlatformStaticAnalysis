@@ -3,9 +3,10 @@
 
 /* IRcodeData */
 
-IRcodeData::IRcodeData(std::unique_ptr<Module>& m)
+IRcodeData::IRcodeData(std::unique_ptr<Module>& m, IPA::SymbolManager& sm)
 {
 	IRmodule = &m;
+	p_symbolManager = &sm;
 	wtask = new IRcodeTextDataSet;
 }
 
@@ -44,8 +45,11 @@ FunctionList& IRcodeData::getFunctionList()
 
 bool IRcodeData::setFunctionList()
 {
+
+#ifdef IR_DEBUG
 	std::ofstream fout;
 	fout.open("FunctionList", std::ofstream::out);
+#endif
 
 	for(auto iter = (*IRmodule)->begin();
 			iter != (*IRmodule)->end(); iter++)
@@ -54,20 +58,24 @@ bool IRcodeData::setFunctionList()
 		llvm::Function& f = (*iter);
 		m_fl.push_back(&f);
 
+#ifdef IR_DEBUG
 		fout << f.getName().str() << std::endl;
+#endif
 	}
 
+#ifdef IR_DEBUG
 	fout.close();
-
+#endif
 	return true;
 }
 
 
 bool IRcodeData::setGlobalVariableList()
 {
+#ifdef IR_DEBUG
 	std::ofstream fout;
 	fout.open("GlobalVariableList", std::ofstream::out);
-
+#endif
 	bool StaticVarFlag = false;
 
 	for(auto iter1 = (*IRmodule)->global_begin();
@@ -96,12 +104,15 @@ bool IRcodeData::setGlobalVariableList()
 		if(StaticVarFlag == false)
 		{
 			m_gvl.push_back(&gvl);
+#ifdef IR_DEBUG
 			fout << gvl.getName().str() << std::endl;
+#endif
 		}
 	}
 
+#ifdef IR_DEBUG
 	fout.close();
-
+#endif
 	return true;
 }
 
@@ -110,9 +121,10 @@ bool IRcodeData::setGlobalVariableList()
 
 bool IRcodeData::setStaticVariableList()
 {
+#ifdef IR_DEBUG
 	std::ofstream fout;
 	fout.open("StaticVariableList", std::ofstream::out);
-
+#endif
 	for(auto iter1 = (*IRmodule)->global_begin();
 			iter1 != (*IRmodule)->global_end(); iter1++)
 	{
@@ -131,26 +143,34 @@ bool IRcodeData::setStaticVariableList()
 			{
 
 				m_svl.push_back(&gvl);
+#ifdef IR_DEBUG
 				fout << gvl.getName().str() << std::endl;
+#endif
 			}
 			
 		}
 
 	}
 
+#ifdef IR_DEBUG
 	fout.close();
-
+#endif
 	return true;
 }
 
+
+/* This function is no use (redundant) */
 void IRcodeData::ShowGlobalVariables(std::unique_ptr<Module> &m){
 	
+#ifdef IR_DEBUG
 	std::ofstream fout;
 	fout.open("AnalysisGlobalVariables", std::ofstream::out);
-	
+#endif
 	int number = 1;
 	
+#ifdef IR_DEBUG
 	std::cout << "[Show Global Variable]" << std::endl;
+#endif
 	for(auto iter = m->global_begin(); iter != m->global_end(); iter++){
 
 		GlobalVariable &gv = (*iter);
@@ -171,12 +191,15 @@ void IRcodeData::ShowGlobalVariables(std::unique_ptr<Module> &m){
 		else 
 			fout << "Unknwon Type ";
 		*/
+#ifdef IR_DEBUG
 		std::cout << gv.getName().str() << std::endl;
 		fout << gv.getName().str() << std::endl;
-
+#endif
 	}
+#ifdef IR_DEBUG
 	std::cout << std::endl;
 	fout.close();
+#endif
 }
 
 
@@ -450,8 +473,10 @@ bool IRcodeData::Preprocess0()
 		wFunction *CurrentFunc = (*iter1);
 		CurrentFunc->FindStaticVariable();
 		CurrentFunc->FindGlobalVariable();
+#ifdef wFUNC_DEBUG		
 		CurrentFunc->showStaticVariable();
 		CurrentFunc->showGlobalVariable();
+#endif		
 		CurrentFunc->DetermineIsReentrant();
 
 	}
@@ -459,6 +484,23 @@ bool IRcodeData::Preprocess0()
 	return true;
 }
 
+
+bool IRcodeData::isPathUncountedFunction(
+		const std::string& fn)
+{
+
+	for(auto iter1 = p_symbolManager->getPUFL().begin();
+			iter1 != p_symbolManager->getPUFL().end(); iter1++)
+	{
+		std::string& PUF = *(*iter1);
+		if(fn == PUF)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
 
 
 bool IRcodeData::Preprocess2(){
@@ -475,13 +517,20 @@ bool IRcodeData::Preprocess2(){
 		wtask->pushFuncList(wf);
 
 		/* Need to be fashioned */
+		/* Not traverse FunctionList */
+		/*
 		if(f.getName().str() == "free" 
 				|| f.getName().str() == "malloc"
 				|| f.getName().str() == "pthread_create"
 				|| f.getName().str() == "pthread_join"
 				|| f.getName().str() == "llvm.dbg.declare"
-				
 				){
+		*/
+
+		//if(isPathUncountedFunction(std::string(f.getName().str()))){
+		if(isPathUncountedFunction(f.getName().str())){
+
+
 
 			BasicBlock &bb = f.getBasicBlockList().front();
 			wBasicBlock *wbb = new wBasicBlock;

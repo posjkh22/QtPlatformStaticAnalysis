@@ -9,8 +9,13 @@ Task::Task(EntryFunctionTy* entry)
 	SetEntryFunction(entry);
 	GeneratePathList();
 	DetermineFunctionList();
-	DetermineReentrantFunctionList();
+	DetermineNonRFL();
 
+}
+
+std::string Task::getTaskName()
+{
+	return m_entryFunction->getName();
 }
 
 
@@ -86,7 +91,7 @@ bool Task::DetermineFunctionList()
 	return true;
 }
 
-bool Task::DetermineReentrantFunctionList()
+bool Task::DetermineNonRFL()
 {
 
 	for(auto iter1 = m_pathList->begin();
@@ -100,16 +105,16 @@ bool Task::DetermineReentrantFunctionList()
 			wBasicBlock* currentBasicBlock = *iter2;	
 			wFunction* parentFunction = currentBasicBlock->getParent();	
 		
-			if(m_ReentrantFunctionList.empty())
+			if(m_NonRFL.empty())
 			{
-				m_ReentrantFunctionList.push_back(parentFunction);
+				m_NonRFL.push_back(parentFunction);
 			}
 
 			else
 			{
 				bool FunctionFoundFlag = false;
-				for(auto iter3 = m_ReentrantFunctionList.begin();
-						iter3 != m_ReentrantFunctionList.end(); iter3++)
+				for(auto iter3 = m_NonRFL.begin();
+						iter3 != m_NonRFL.end(); iter3++)
 				{
 					if(parentFunction == *iter3)
 					{
@@ -122,7 +127,7 @@ bool Task::DetermineReentrantFunctionList()
 				{
 					if(parentFunction->isReentrant())
 					{
-						m_ReentrantFunctionList.push_back(parentFunction);
+						m_NonRFL.push_back(parentFunction);
 					}
 				}
 			}
@@ -136,8 +141,12 @@ bool Task::DetermineReentrantFunctionList()
 
 bool Task::ShowFunctionList()
 {
+#ifdef TASK_DEBUG
 	std::cout << "Function" << std::endl;
 	std::cout << "Num: " << m_FunctionList.size() << std::endl;
+#endif
+
+
 	for(auto iter1 = m_FunctionList.begin();
 			iter1 != m_FunctionList.end(); iter1++)
 	{
@@ -152,20 +161,31 @@ bool Task::ShowFunctionList()
 	return true;
 }
 
-bool Task::ShowReentrantFunctionList()
+bool Task::ShowNonRFL()
 {
-	std::cout << "Reentrant Function" << std::endl;
-	std::cout << "Num: " << m_ReentrantFunctionList.size() << std::endl;
-	for(auto iter1 = m_ReentrantFunctionList.begin();
-			iter1 != m_ReentrantFunctionList.end(); iter1++)
+	std::ofstream fout;
+	fout.open("./dat/NonReentrantFunctionList.dat", std::ofstream::out | std::ofstream::app);
+	
+	std::cout << "Non Reentrant Function" << std::endl;
+#ifdef TASK_DEBUG
+	std::cout << "Num: " << m_NonRFL.size() << std::endl;
+#endif
+
+	fout << "#Task: " << getTaskName() << std::endl;
+
+	for(auto iter1 = m_NonRFL.begin();
+			iter1 != m_NonRFL.end(); iter1++)
 	{
 		wFunction* currentFunc = *iter1;
 		//std::cout << currentFunc->getName() << " ";
 		std::cout << currentFunc->getFunction()->getName().str() << " ";
+		fout << currentFunc->getFunction()->getName().str() << " ";
 
 	}
 	std::cout << std::endl;
-
+	
+	fout << std::endl;
+	fout.close();
 	return true;
 }
 

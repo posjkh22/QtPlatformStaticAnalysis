@@ -10,6 +10,11 @@ BugReport::BugReport(IRcodeData* IRcode)
 }
 */
 
+/*
+
+BugReport only tells you about the information related to source code 
+
+*/
 
 unsigned int BugReport::returnBugLocation()
 {

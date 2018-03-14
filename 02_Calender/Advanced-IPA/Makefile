@@ -1,5 +1,7 @@
 OUTPUT 			= code_analysis
 SRC				=./src
+CHECKER_SRC		=./Checker
+CHECKER_LIB		=./lib
 LIB				=./lib
 INCLUDE			=./include
 TESTCASE		= ./TestCases
@@ -10,6 +12,8 @@ THREAD_OPTION1	= --thread=Unithread
 THREAD_OPTION2	= --thread=Multithread
 ANALYSIS_OPTION	= --analysis=MemoryAllocationC
 
+test:
+	make -C ./TestCases
 
 run: all
 	./$(OUTPUT) $(TESTCASE)/$(TESTCLASS)/$(TEST).bc $(TARGET_OPTION) $(THREAD_OPTION2) $(ANALYSIS_OPTION)
@@ -17,12 +21,43 @@ run: all
 run2: 
 	./$(OUTPUT) $(TESTCASE)/$(TESTCLASS)/$(TEST).bc $(TARGET_OPTION) $(THREAD_OPTION2) $(ANALYSIS_OPTION)
 
+CheckerList: c1 c2 c3 c4
 
-all: clean main Support ArgumentPass TaskManager Task IRcodeData IRcodeTextDataSet wFunction wBasicBlock wInstruction path pathImpl checker BugReport
+c1:
+	clang++ -std=c++11 \
+	-c $(CHECKER_SRC)/Checker1.cpp \
+	-o $(LIB)/Checker1.o \
+	-I$(INCLUDE) \
+	`llvm-config --cxxflags`
+c2:
+	clang++ -std=c++11 \
+	-c $(CHECKER_SRC)/Checker2.cpp \
+	-o $(LIB)/Checker2.o \
+	-I$(INCLUDE) \
+	`llvm-config --cxxflags`
+c3:
+	clang++ -std=c++11 \
+	-c $(CHECKER_SRC)/Checker3.cpp \
+	-o $(LIB)/Checker3.o \
+	-I$(INCLUDE) \
+	`llvm-config --cxxflags`
+c4:	
+	clang++ -std=c++11 \
+	-c $(CHECKER_SRC)/MemoryAllocationC.cpp \
+	-o $(LIB)/MemoryAllocationC.o \
+	-I$(INCLUDE) \
+	`llvm-config --cxxflags`
+
+
+
+	
+
+link: result_clean
 	clang++ -std=c++11 \
 	$(LIB)/main.o \
 	$(LIB)/IRcodeData.o \
 	$(LIB)/ArgumentPass.o \
+	$(LIB)/SymbolManager.o \
 	$(LIB)/TaskManager.o \
 	$(LIB)/Task.o \
 	$(LIB)/IRcodeTextDataSet.o \
@@ -34,7 +69,37 @@ all: clean main Support ArgumentPass TaskManager Task IRcodeData IRcodeTextDataS
 	$(LIB)/PathImpl.o \
 	$(LIB)/checker.o \
 	$(LIB)/BugReport.o \
+	$(CHECKER_LIB)/MemoryAllocationC.o \
+	$(CHECKER_LIB)/Checker1.o \
+	$(CHECKER_LIB)/Checker2.o \
+	$(CHECKER_LIB)/Checker3.o \
 	-o $(OUTPUT) \
+	-ljsoncpp \
+	`llvm-config --cxxflags --libs --ldflags --system-libs`
+
+all: clean main Support ArgumentPass SymbolManager TaskManager Task IRcodeData IRcodeTextDataSet wFunction wBasicBlock wInstruction path pathImpl checker BugReport
+	clang++ -std=c++11 \
+	$(LIB)/main.o \
+	$(LIB)/IRcodeData.o \
+	$(LIB)/ArgumentPass.o \
+	$(LIB)/SymbolManager.o \
+	$(LIB)/TaskManager.o \
+	$(LIB)/Task.o \
+	$(LIB)/IRcodeTextDataSet.o \
+	$(LIB)/wFunction.o \
+	$(LIB)/wBasicBlock.o \
+	$(LIB)/wInstruction.o \
+	$(LIB)/Support.o \
+	$(LIB)/Path.o \
+	$(LIB)/PathImpl.o \
+	$(LIB)/checker.o \
+	$(LIB)/BugReport.o \
+	$(CHECKER_LIB)/MemoryAllocationC.o \
+	$(CHECKER_LIB)/Checker1.o \
+	$(CHECKER_LIB)/Checker2.o \
+	$(CHECKER_LIB)/Checker3.o \
+	-o $(OUTPUT) \
+	-ljsoncpp \
 	`llvm-config --cxxflags --libs --ldflags --system-libs`
 	
 main:
@@ -54,6 +119,13 @@ ArgumentPass:
 	clang++ -std=c++11 \
 	-c $(SRC)/ArgumentPass.cpp \
 	-o $(LIB)/ArgumentPass.o \
+	-I$(INCLUDE) \
+	`llvm-config --cxxflags`
+
+SymbolManager:
+	clang++ -std=c++11 \
+	-c $(SRC)/SymbolManager.cpp \
+	-o $(LIB)/SymbolManager.o \
 	-I$(INCLUDE) \
 	`llvm-config --cxxflags`
 
@@ -138,5 +210,5 @@ clean:
 	rm -f $(OUTPUT) test_out $(LIB)/*.o Analysis*
 
 result_clean:
-	rm -f Analysis*
+	rm -f Analysis* ./dat/*
 

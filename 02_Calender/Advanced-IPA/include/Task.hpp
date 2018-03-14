@@ -17,7 +17,7 @@ namespace IPA
 {
 
 typedef std::list<wFunction* > FunctionListTy;
-typedef std::list<wFunction* > ReentrantFunctionListTy;
+typedef std::list<wFunction* > NonRetrantFunctionListTy;
 typedef wFunction EntryFunctionTy;
 
 typedef std::list<Path *> PathListTy;
@@ -36,6 +36,8 @@ public:
 	bool SetEntryFunction(EntryFunctionTy* );
 	EntryFunctionTy* GetEntryFunction();
 
+public:
+	std::string getTaskName();
 
 private:
 	PathListTy* m_pathList;
@@ -48,13 +50,13 @@ public:
 
 private:
 	FunctionListTy m_FunctionList;
-	ReentrantFunctionListTy m_ReentrantFunctionList;
+	NonRetrantFunctionListTy m_NonRFL;
 
 public:
 	bool DetermineFunctionList();
-	bool DetermineReentrantFunctionList();
+	bool DetermineNonRFL();
 	bool ShowFunctionList();
-	bool ShowReentrantFunctionList();
+	bool ShowNonRFL();
 
 
 

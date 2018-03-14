@@ -27,7 +27,7 @@ bool PathList::ShowPathList(){
 	std::list<Path *>::iterator iter1;
 	
 	std::ofstream fout;
-	fout.open("AnalysisPaths", std::ofstream::out | std::ofstream::app);
+	fout.open("./dat/PossiblePaths.dat", std::ofstream::out | std::ofstream::app);
 
 	for(iter1 = PathListPtr->begin(); iter1 != PathListPtr->end(); iter1++){ 
 

@@ -22,6 +22,7 @@
 #include "ArgumentPass.hpp"
 #include "TaskManager.hpp"
 #include "BugReport.hpp"
+#include "SymbolManager.hpp"
 
 /* 2018-01-25 */
 
@@ -44,6 +45,10 @@
 
 */
 
+
+const char OSJSON[]="./Json/OperatingSystemList.json";
+const char TFUNCJSON[]="./Json/TargetFunctionList.json";
+
 using namespace llvm;
 
 /* To easily pass varaibles */
@@ -52,6 +57,16 @@ GlobalVariable *comp_gv;
 //std::unique_ptr<Module> m; 
 
 int main(int argc, char *argv[]) {
+
+
+	/* Symbol Manager */
+
+	IPA::SymbolManager sm(new IPA::PathUncountedFunction,
+				new IPA::ThreadSupportOS);
+	
+	sm.Process(OSJSON, TFUNCJSON);
+
+	sm.DEBUG_showPUFL();
 
 	/* Process Argument */
 	IPA::ArgumentPass arg;
@@ -65,13 +80,13 @@ int main(int argc, char *argv[]) {
 	std::unique_ptr<Module> m = parseIRFile(filename, error, context);
 	
 	/* Wrapper */
-	IRcodeData IRcode(m);
+	IRcodeData IRcode(m, sm);
 
 	/* Global Variable */
 
-	IRcode.ShowGlobalVariables(m);
+	//IRcode.ShowGlobalVariables(m);
 
-	comp_gv = IRcode.popGlobalVariable(m, 0);
+	//comp_gv = IRcode.popGlobalVariable(m, 0);
 
 	/* Function */
 	IRcode.Preprocess1();
@@ -97,10 +112,10 @@ int main(int argc, char *argv[]) {
 		
 		PathListTy* gpl = t->getPathList();
 
-		t->ShowFunctionList();
-		t->ShowReentrantFunctionList();
+		//t->ShowFunctionList();
+		t->ShowNonRFL();
 
-		/*
+		
 		PathList m_PathList(gpl);
 		m_PathList.ShowPathList();
 	
@@ -108,8 +123,8 @@ int main(int argc, char *argv[]) {
 		IPA::BugReport brp;
 
 		Checker checker(&brp, &arg);
-		checker.check(&m_PathList);
-		*/
+		checker.CheckerRunsOnPathList(&m_PathList);
+		
 		//brp.showBugLocation();
 
 

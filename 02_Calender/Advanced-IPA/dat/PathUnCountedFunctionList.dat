@@ -1,0 +1,17 @@
+pthread_create
+pthread_join
+sem_init
+sem_wait
+sem_post
+FREEthread_create
+FREEthread_join
+FREE_init
+FREE_wait
+FREE_post
+malloc
+free
+open
+close
+fopen
+fclose
+llvm.dbg.declare

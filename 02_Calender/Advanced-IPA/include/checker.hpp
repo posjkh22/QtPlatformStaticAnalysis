@@ -127,7 +127,9 @@ private:
 	IPA::ArgumentPass *m_ArgumentPass;
 
 private:
-	checker_ty type;
+	checker_ty m_CheckerType;
+
+private:
 	int trace_flag;
 	int trace_new_func_flag;
 	int basic_checker_state_flag;
@@ -144,10 +146,17 @@ private:
 
 public:
 	Checker(IPA::BugReport *bugReport, IPA::ArgumentPass *argument);
+	Checker(PathList *);
+	Checker(Path *);
 
+private:
+	/* CheckerTy Related */
 	bool checkerTyDetermination();
-
 	bool setCheckerTy(checker_ty ty);
+	checker_ty getCheckerTy();
+
+private:
+	/* TraceData Related */
 	TraceData *SearchTraceVal(unsigned int iter_count);
 	TraceData *SearchTraceVal(llvm::Value *cmp_val);
 	bool ShowTraceData();
@@ -163,46 +172,46 @@ public:
 	bool ResetPassingReturnVal();
 	bool ResetPassingArgument();
 
+private:
+	/* BugReport Related */
 	bool BugReport();
 
-	/* check */
+public:
+	/* checkerRuns Related */
+	bool CheckerRunsOnPathList(PathList *pathlist);
+private:
+	bool CheckerRunsOnPath(Path *path);
+	bool CheckerRunsOnBasicBlock(wBasicBlock *BB);
 
-	bool check(PathList *pathlist);
-	bool check(Path *path);
-	bool check(wBasicBlock *BB);
+	/* checker set Related */
 
-	/* checker set */
+#include "../Checker/CheckerList.inc"
+
+	/*
 	bool check1(wBasicBlock *BB, wInstruction *Inst);
 	bool check2(wBasicBlock *BB, wInstruction *Inst, GlobalVariable *gv);
 	bool check3(wBasicBlock *BB, wInstruction *Inst, GlobalVariable *gv);
 	bool check4(wBasicBlock *BB, wInstruction *Inst);
 	bool check5(wBasicBlock *BB, wInstruction *Inst);
+	*/
 
+private:
 	/* PathList */
-	Checker(PathList *);
-
 	bool attachPathList(PathList *);
-	
 	bool setCurrentPathList(PathList *);
-
 	PathList *getCurrentPathList();
-
 	bool movePath();
 
 
+private:
 	/* Path */
-	Checker(Path *);
-
 	bool attachPath(Path *);
-	
 	Path *getCurrentPath();
 	bool setCurrentPath(Path *);
-
 	bool move();
 
-
+private:
 	/* BB */
-
 	wBasicBlock *getCurrentBB();
 	bool setCurrentBB(wBasicBlock *);
 

@@ -49,16 +49,18 @@ StaticVariableList& wFunction::getStaticVariableList()
 
 bool wFunction::showGlobalVariable()
 {
-	
+#ifdef wFUNC_DEBUG	
 	std::ofstream fout;
 	fout.open("AnalysisFuncGlobalVariables", std::ofstream::out | std::ofstream::app);
 	
 	fout << this->getFunction()->getName().str() << ":" <<  std::endl; 
-
+#endif
 	if(m_gvl.empty())
 	{
+#ifdef wFUNC_DEBUG	
 		fout << "No Global Variables" <<  std::endl; 
 		fout.close();
+#endif
 		return true;
 	}
 
@@ -66,11 +68,14 @@ bool wFunction::showGlobalVariable()
 			iter != m_gvl.end(); iter++)
 	{
 		GlobalVariable* gv = *iter;
+#ifdef wFUNC_DEBUG	
 		fout << gv->getName().str() << std::endl;
-		
+#endif		
 	}
 
+#ifdef wFUNC_DEBUG	
 	fout.close();
+#endif		
 
 	return true;
 }
@@ -78,28 +83,33 @@ bool wFunction::showGlobalVariable()
 bool wFunction::showStaticVariable()
 {
 	
+#ifdef wFUNC_DEBUG	
 	std::ofstream fout;
 	fout.open("AnalysisFuncStaticVariables", std::ofstream::out | std::ofstream::app);
-	
 	fout << this->getFunction()->getName().str() << ":" <<  std::endl; 
 
+#endif	
 	if(m_svl.empty())
 	{
+#ifdef wFUNC_DEBUG	
 		fout << "No Static Variables" <<  std::endl; 
 		fout.close();
 		return true;
+#endif
 	}
 
 	for(auto iter = m_svl.begin(); 
 			iter != m_svl.end(); iter++)
 	{
 		GlobalVariable* sv = *iter;
+#ifdef wFUNC_DEBUG	
 		fout << sv->getName().str() << std::endl;
-		
+#endif		
 	}
 
+#ifdef wFUNC_DEBUG	
 	fout.close();
-
+#endif
 	return true;
 }
 
