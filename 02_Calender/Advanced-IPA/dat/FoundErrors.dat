@@ -1,38 +1,11 @@
-[Checker is running on Path [2]..]
-[Checker: Error Detected]
- - Improper free(0x19c9728/-1/t2_fnc1/1/1)
- - Directory: testcase8
- - Finename: testcase8-1.c
- - Line: 24
- - BasicBlock: t2_fnc1%3
-
-[Checker is running on Path [3]..]
-[Checker: Error Detected]
- - Improper free(0x19d9b98/-1/task2/1/1)
- - Directory: testcase8
- - Finename: testcase8-1.c
- - Line: 86
- - BasicBlock: task2%14
-
 [Checker is running on Path [0]..]
 [Checker: Error Detected]
- - Allocated Memory is Not freed(0x19cea70/1/task1/1/1)
- - Directory: testcase8
- - Finename: testcase8-1.c
- - Line: 43
- - BasicBlock: task1%4
+ - Allocated Memory is Not freed(0x1b287c0/1/main/1/0)
+ - BasicBlock: main%0
 
- - Allocated Memory is Not freed(0x19cec28/1/task1/1/1)
- - Directory: testcase8
- - Finename: testcase8-1.c
- - Line: 43
- - BasicBlock: task1%5
+ - Allocated Memory is Not freed(0x1b28898/1/main/1/0)
+ - BasicBlock: main%1
 
- - Allocated Memory is Not freed(0x19ccfb8/1/task1/1/1)
- - Directory: testcase8
- - Finename: testcase8-1.c
- - Line: 43
- - BasicBlock: task1%5
+ - Allocated Memory is Not freed(0x1b27c18/1/main/1/0)
+ - BasicBlock: main%1
 
-[Checker is running on Path [1]..]
-[No Error Code was Found] 

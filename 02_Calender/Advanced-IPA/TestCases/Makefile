@@ -8,6 +8,7 @@ all:
 	make -C ./testcase6
 	make -C ./testcase7
 	make -C ./testcase8
+	make -C ./testcase9
 
 clean:
 	make clean -C ./testcase1
@@ -18,3 +19,4 @@ clean:
 	make clean -C ./testcase6
 	make clean -C ./testcase7
 	make clean -C ./testcase8
+	make clean -C ./testcase9

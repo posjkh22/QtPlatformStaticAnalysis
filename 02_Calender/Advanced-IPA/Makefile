@@ -5,8 +5,8 @@ CHECKER_LIB		=./lib
 LIB				=./lib
 INCLUDE			=./include
 TESTCASE		= ./TestCases
-TESTCLASS 		= testcase8
-TEST			= testcase8-1
+TESTCLASS 		= testcase9
+TEST			= testcase9-1
 TARGET_OPTION 	= --target=Linux
 THREAD_OPTION1	= --thread=Unithread
 THREAD_OPTION2	= --thread=Multithread
@@ -16,10 +16,10 @@ test:
 	make -C ./TestCases
 
 run: all
-	./$(OUTPUT) $(TESTCASE)/$(TESTCLASS)/$(TEST).bc $(TARGET_OPTION) $(THREAD_OPTION2) $(ANALYSIS_OPTION)
+	./$(OUTPUT) $(TESTCASE)/$(TESTCLASS)/$(TEST).bc $(TARGET_OPTION) $(THREAD_OPTION1) $(ANALYSIS_OPTION)
 
 run2: 
-	./$(OUTPUT) $(TESTCASE)/$(TESTCLASS)/$(TEST).bc $(TARGET_OPTION) $(THREAD_OPTION2) $(ANALYSIS_OPTION)
+	./$(OUTPUT) $(TESTCASE)/$(TESTCLASS)/$(TEST).bc $(TARGET_OPTION) $(THREAD_OPTION1) $(ANALYSIS_OPTION)
 
 CheckerList: c1 c2 c3 c4
 

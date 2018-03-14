@@ -7,9 +7,9 @@
 			{
 				"TaskGen": "pthread_create",
 				"TaskEnd": "pthread_join",
-				"sem_init": "sem_init",
-				"sem_wait": "sem_wait",
-				"sem_post": "sem_post"
+				"sem_init": "pthread_mutex_init",
+				"sem_wait": "pthread_mutex_lock",
+				"sem_post": "pthread_mutex_unlock"
 			}
 		},
 		

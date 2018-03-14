@@ -72,10 +72,10 @@ bool IRcodeData::setFunctionList()
 
 bool IRcodeData::setGlobalVariableList()
 {
-#ifdef IR_DEBUG
+//#ifdef IR_DEBUG
 	std::ofstream fout;
-	fout.open("GlobalVariableList", std::ofstream::out);
-#endif
+	fout.open("./dat/DetectGV.dat", std::ofstream::out);
+//#endif
 	bool StaticVarFlag = false;
 
 	for(auto iter1 = (*IRmodule)->global_begin();
@@ -104,9 +104,9 @@ bool IRcodeData::setGlobalVariableList()
 		if(StaticVarFlag == false)
 		{
 			m_gvl.push_back(&gvl);
-#ifdef IR_DEBUG
+//#ifdef IR_DEBUG
 			fout << gvl.getName().str() << std::endl;
-#endif
+//#endif
 		}
 	}
 
