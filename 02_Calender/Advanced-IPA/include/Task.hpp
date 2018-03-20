@@ -19,6 +19,8 @@ namespace IPA
 typedef std::list<wFunction* > FunctionListTy;
 typedef std::list<wFunction* > NonRetrantFunctionListTy;
 typedef wFunction EntryFunctionTy;
+typedef std::list<llvm::Value* > SemaphoreValueListTy;
+
 
 typedef std::list<Path *> PathListTy;
 
@@ -26,8 +28,13 @@ typedef std::list<Path *> PathListTy;
 class Task
 {
 
+private:
+	IPA::SymbolManager* p_symbolManager;
+
 public:
-	Task(EntryFunctionTy* );
+	Task(EntryFunctionTy*, SymbolManager* );
+
+	bool Process();
 
 private:
 	EntryFunctionTy* m_entryFunction;
@@ -51,15 +58,17 @@ public:
 private:
 	FunctionListTy m_FunctionList;
 	NonRetrantFunctionListTy m_NonRFL;
+	SemaphoreValueListTy m_DSVL;
+	SemaphoreValueListTy m_LSVL;
+	SemaphoreValueListTy m_USVL;
 
 public:
 	bool DetermineFunctionList();
 	bool DetermineNonRFL();
+	bool DetermineSemaphoreVariableList();
 	bool ShowFunctionList();
 	bool ShowNonRFL();
-
-
-
+	bool ShowNonRFL(const char*);
 
 
 };

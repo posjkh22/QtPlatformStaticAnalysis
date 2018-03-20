@@ -1,0 +1,86 @@
+; ModuleID = 'testcase9-2.c'
+source_filename = "testcase9-2.c"
+target datalayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-unknown-linux-gnu"
+
+%union.pthread_mutex_t = type { %struct.__pthread_mutex_s }
+%struct.__pthread_mutex_s = type { i32, i32, i32, i32, i32, i16, i16, %struct.__pthread_internal_list }
+%struct.__pthread_internal_list = type { %struct.__pthread_internal_list*, %struct.__pthread_internal_list* }
+%union.pthread_mutexattr_t = type { i32 }
+%union.pthread_attr_t = type { i64, [48 x i8] }
+
+@var = global i32 1, align 4
+@mutex_lock1 = common global %union.pthread_mutex_t zeroinitializer, align 8
+@mutex_lock2 = common global %union.pthread_mutex_t zeroinitializer, align 8
+
+; Function Attrs: noinline nounwind optnone uwtable
+define void @task1() #0 {
+  %1 = call i32 @pthread_mutex_lock(%union.pthread_mutex_t* @mutex_lock1) #3
+  %2 = load i32, i32* @var, align 4
+  %3 = add nsw i32 %2, 1
+  store i32 %3, i32* @var, align 4
+  %4 = call i32 @pthread_mutex_unlock(%union.pthread_mutex_t* @mutex_lock1) #3
+  ret void
+}
+
+; Function Attrs: nounwind
+declare i32 @pthread_mutex_lock(%union.pthread_mutex_t*) #1
+
+; Function Attrs: nounwind
+declare i32 @pthread_mutex_unlock(%union.pthread_mutex_t*) #1
+
+; Function Attrs: noinline nounwind optnone uwtable
+define void @task2() #0 {
+  %1 = call i32 @pthread_mutex_lock(%union.pthread_mutex_t* @mutex_lock2) #3
+  %2 = load i32, i32* @var, align 4
+  %3 = add nsw i32 %2, 1
+  store i32 %3, i32* @var, align 4
+  %4 = call i32 @pthread_mutex_unlock(%union.pthread_mutex_t* @mutex_lock2) #3
+  ret void
+}
+
+; Function Attrs: noinline nounwind optnone uwtable
+define i32 @main() #0 {
+  %1 = alloca i32, align 4
+  %2 = alloca i32*, align 8
+  %3 = alloca i64, align 8
+  %4 = alloca i64, align 8
+  %5 = alloca i32, align 4
+  store i32 0, i32* %1, align 4
+  %6 = call noalias i8* @malloc(i64 4) #3
+  %7 = bitcast i8* %6 to i32*
+  store i32* %7, i32** %2, align 8
+  %8 = call i32 @pthread_mutex_init(%union.pthread_mutex_t* @mutex_lock1, %union.pthread_mutexattr_t* null) #3
+  %9 = call i32 @pthread_mutex_init(%union.pthread_mutex_t* @mutex_lock2, %union.pthread_mutexattr_t* null) #3
+  %10 = call i32 @pthread_create(i64* %3, %union.pthread_attr_t* null, i8* (i8*)* bitcast (void ()* @task1 to i8* (i8*)*), i8* null) #3
+  %11 = call i32 @pthread_create(i64* %4, %union.pthread_attr_t* null, i8* (i8*)* bitcast (void ()* @task2 to i8* (i8*)*), i8* null) #3
+  %12 = ptrtoint i64* %3 to i64
+  %13 = bitcast i32* %5 to i8**
+  %14 = call i32 @pthread_join(i64 %12, i8** %13)
+  %15 = ptrtoint i64* %4 to i64
+  %16 = bitcast i32* %5 to i8**
+  %17 = call i32 @pthread_join(i64 %15, i8** %16)
+  ret i32 0
+}
+
+; Function Attrs: nounwind
+declare noalias i8* @malloc(i64) #1
+
+; Function Attrs: nounwind
+declare i32 @pthread_mutex_init(%union.pthread_mutex_t*, %union.pthread_mutexattr_t*) #1
+
+; Function Attrs: nounwind
+declare i32 @pthread_create(i64*, %union.pthread_attr_t*, i8* (i8*)*, i8*) #1
+
+declare i32 @pthread_join(i64, i8**) #2
+
+attributes #0 = { noinline nounwind optnone uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="true" "no-frame-pointer-elim-non-leaf" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #1 = { nounwind "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="true" "no-frame-pointer-elim-non-leaf" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #2 = { "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="true" "no-frame-pointer-elim-non-leaf" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #3 = { nounwind }
+
+!llvm.module.flags = !{!0}
+!llvm.ident = !{!1}
+
+!0 = !{i32 1, !"wchar_size", i32 4}
+!1 = !{!"clang version 5.0.0 (tags/RELEASE_500/final)"}

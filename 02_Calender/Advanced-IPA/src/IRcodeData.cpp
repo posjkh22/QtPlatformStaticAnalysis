@@ -24,6 +24,10 @@ std::unique_ptr<Module>* IRcodeData::getIRmodule()
 	return IRmodule;
 }
 
+IPA::SymbolManager* IRcodeData::getSymbolManager()
+{
+	return p_symbolManager;
+}
 
 
 GlobalVariableList& IRcodeData::getGlobalVariableList()

@@ -8,21 +8,11 @@ Task::Task(EntryFunctionTy* entry, SymbolManager* sm)
 {
 	p_symbolManager = sm;
 	SetEntryFunction(entry);
-}
-
-bool Task::Process()
-{
-
 	GeneratePathList();
 	DetermineFunctionList();
 	DetermineNonRFL();
 	DetermineSemaphoreVariableList();
-	ShowNonRFL();
-	ShowNonRFL("./dat/NonReentrantFunctionList.dat");
-
-	return true;
 }
-
 
 std::string Task::getTaskName()
 {
@@ -60,7 +50,7 @@ PathListTy* Task::getPathList()
 bool Task::DetermineSemaphoreVariableList()
 {
 
-	std::cout << "SemVal Analysis in " <<  getTaskName() << std::endl;
+	std::cout << "Defined SemVal in " <<  getTaskName() << std::endl;
 
 
 	for(auto iter1 = m_pathList->begin();
@@ -163,100 +153,13 @@ bool Task::DetermineSemaphoreVariableList()
 								}
 							}
 						}
-					
-					}
-
-
-
-					if(calleeF->getName().str() == std::string("pthread_mutex_lock"))
-					{
-						llvm::Value* semValue = currentInst.getOperand(0);
-						std::cout << "Locked SemValue: " << semValue->getName().str() << std::endl;
-
-
-						if(m_LSVL.empty())
-						{
-							m_LSVL.push_back(semValue);
-							
-						}
-						else
-						{
-
-							bool FoundSemValFlag = false;
-							for(auto iter5 = m_LSVL.begin();
-									iter5 != m_LSVL.end(); iter5++)
-							{
-								if(semValue == *iter5)
-								{
-									FoundSemValFlag = true;
-									break;
-								}
-								else
-								{
-									/* empty */
-								}
-
-								if(FoundSemValFlag == false)
-								{
-									m_LSVL.push_back(semValue);
-								}
-								else
-								{
-									/* empty */
-								}
-							}
-						}
-					}
-
-
-					if(calleeF->getName().str() == std::string("pthread_mutex_unlock"))
-					{
-						llvm::Value* semValue = currentInst.getOperand(0);
-						std::cout << "Unlocked SemValue: " << semValue->getName().str() << std::endl;
-
-
-						if(m_USVL.empty())
-						{
-
-							m_USVL.push_back(semValue);
-							
-						}
-						else
-						{
-
-							bool FoundSemValFlag = false;
-							for(auto iter5 = m_USVL.begin();
-									iter5 != m_USVL.end(); iter5++)
-							{
-								if(semValue == *iter5)
-								{
-									FoundSemValFlag = true;
-									break;
-								}
-
-
-								else
-								{
-									/* empty */
-								}
-
-								if(FoundSemValFlag == false)
-								{
-									m_USVL.push_back(semValue);
-								}
-								else
-
-								{
-									/* empty */
-								}
-							}
-						}
 					}
 
 
 				}
 				
 			}
+
 	
 		}
 
@@ -264,18 +167,8 @@ bool Task::DetermineSemaphoreVariableList()
 
 	if(m_DSVL.empty())
 	{
-		std::cout << "Defined SemValue: None" << std::endl;
+		std::cout << "SemValue: None" << std::endl;
 	}
-	if(m_LSVL.empty())
-	{
-		std::cout << "Locked SemValue: None" << std::endl;
-	}
-	if(m_USVL.empty())
-	{
-		std::cout << "Unlocked SemValue: None" << std::endl;
-	}
-
-
 
 	std::cout << std::endl;
 
@@ -400,40 +293,33 @@ bool Task::ShowFunctionList()
 
 bool Task::ShowNonRFL()
 {
-	
-	std::cout << "Non-Reentrant Func in " << getTaskName() << std::endl;
-
-	for(auto iter1 = m_NonRFL.begin();
-			iter1 != m_NonRFL.end(); iter1++)
-	{
-		wFunction* currentFunc = *iter1;
-		std::cout << currentFunc->getFunction()->getName().str() << " ";
-
-	}
-	std::cout << std::endl;
-	std::cout << std::endl;
-	
-	return true;
-}
-
-bool Task::ShowNonRFL(const char* dat)
-{
 	std::ofstream fout;
-	fout.open(dat, std::ofstream::out | std::ofstream::app);
+	fout.open("./dat/NonReentrantFunctionList.dat", std::ofstream::out | std::ofstream::app);
 	
+	std::cout << "Non Reentrant Function" << std::endl;
+#ifdef TASK_DEBUG
+	std::cout << "Num: " << m_NonRFL.size() << std::endl;
+#endif
+
 	fout << "#Task: " << getTaskName() << std::endl;
 
 	for(auto iter1 = m_NonRFL.begin();
 			iter1 != m_NonRFL.end(); iter1++)
 	{
 		wFunction* currentFunc = *iter1;
+		//std::cout << currentFunc->getName() << " ";
+		std::cout << currentFunc->getFunction()->getName().str() << " ";
 		fout << currentFunc->getFunction()->getName().str() << " ";
+
 	}
+	std::cout << std::endl;
+	std::cout << std::endl;
+	
 	fout << std::endl;
 	fout.close();
-	
 	return true;
 }
+
 
 
 

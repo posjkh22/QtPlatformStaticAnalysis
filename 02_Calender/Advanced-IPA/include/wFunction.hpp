@@ -122,6 +122,9 @@ public:
 	PathListTy* makePathList();
 	PathListTy* getPathList();
 
+public:
+	bool haveSemaphoreVariable();
+
 
 };
 

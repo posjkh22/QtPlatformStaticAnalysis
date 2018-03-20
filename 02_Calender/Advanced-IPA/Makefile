@@ -6,22 +6,23 @@ LIB				=./lib
 INCLUDE			=./include
 TESTCASE		= ./TestCases
 TESTCLASS 		= testcase9
-TEST			= testcase9-1
+TEST			= testcase9-2
 TARGET_OPTION 	= --target=Linux
 THREAD_OPTION1	= --thread=Unithread
 THREAD_OPTION2	= --thread=Multithread
-ANALYSIS_OPTION	= --analysis=MemoryAllocationC
+ANALYSIS_OPTION1	= --analysis=MemoryAllocationC
+ANALYSIS_OPTION2	= --analysis=SemaphoreIntegrity
 
 test:
 	make -C ./TestCases
 
 run: all
-	./$(OUTPUT) $(TESTCASE)/$(TESTCLASS)/$(TEST).bc $(TARGET_OPTION) $(THREAD_OPTION1) $(ANALYSIS_OPTION)
+	./$(OUTPUT) $(TESTCASE)/$(TESTCLASS)/$(TEST).bc $(TARGET_OPTION) $(THREAD_OPTION2) $(ANALYSIS_OPTIOIN2)
 
 run2: 
-	./$(OUTPUT) $(TESTCASE)/$(TESTCLASS)/$(TEST).bc $(TARGET_OPTION) $(THREAD_OPTION1) $(ANALYSIS_OPTION)
+	./$(OUTPUT) $(TESTCASE)/$(TESTCLASS)/$(TEST).bc $(TARGET_OPTION) $(THREAD_OPTION2) $(ANALYSIS_OPTION2)
 
-CheckerList: c1 c2 c3 c4
+CheckerList: c1 c2 c3 c4 c5
 
 c1:
 	clang++ -std=c++11 \
@@ -47,6 +48,12 @@ c4:
 	-o $(LIB)/MemoryAllocationC.o \
 	-I$(INCLUDE) \
 	`llvm-config --cxxflags`
+c5:	
+	clang++ -std=c++11 \
+	-c $(CHECKER_SRC)/Semaphore.cpp \
+	-o $(LIB)/Semaphore.o \
+	-I$(INCLUDE) \
+	`llvm-config --cxxflags`
 
 
 
@@ -70,6 +77,7 @@ link: result_clean
 	$(LIB)/checker.o \
 	$(LIB)/BugReport.o \
 	$(CHECKER_LIB)/MemoryAllocationC.o \
+	$(CHECKER_LIB)/Semaphore.o \
 	$(CHECKER_LIB)/Checker1.o \
 	$(CHECKER_LIB)/Checker2.o \
 	$(CHECKER_LIB)/Checker3.o \
@@ -77,7 +85,23 @@ link: result_clean
 	-ljsoncpp \
 	`llvm-config --cxxflags --libs --ldflags --system-libs`
 
-all: clean main Support ArgumentPass SymbolManager TaskManager Task IRcodeData IRcodeTextDataSet wFunction wBasicBlock wInstruction path pathImpl checker BugReport
+all: clean \
+		main \
+		Support \
+		ArgumentPass \
+		SymbolManager \
+		TaskManager \
+		Task \
+		IRcodeData \
+		IRcodeTextDataSet \
+		wFunction \
+		wBasicBlock \
+		wInstruction \
+		path \
+		pathImpl \
+		checker \
+		BugReport \
+		CheckerList 
 	clang++ -std=c++11 \
 	$(LIB)/main.o \
 	$(LIB)/IRcodeData.o \
@@ -95,6 +119,7 @@ all: clean main Support ArgumentPass SymbolManager TaskManager Task IRcodeData I
 	$(LIB)/checker.o \
 	$(LIB)/BugReport.o \
 	$(CHECKER_LIB)/MemoryAllocationC.o \
+	$(CHECKER_LIB)/Semaphore.o \
 	$(CHECKER_LIB)/Checker1.o \
 	$(CHECKER_LIB)/Checker2.o \
 	$(CHECKER_LIB)/Checker3.o \

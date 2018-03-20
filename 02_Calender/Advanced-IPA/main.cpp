@@ -105,17 +105,22 @@ int main(int argc, char *argv[]) {
 
 	/* TaskManager */
 	IPA::TaskManager tm(&arg, &IRcode);
+	tm.Process();
+
+	/* Analysis Manager */
+	/*
+	IPA::AnalysisManager am(&tm);
+	am.run();
+	*/
+
 
 	for(unsigned int i = 0; i < tm.getTaskNum(); i++)
 	{
+
 		IPA::Task* t = tm.getTask();	
 		
 		PathListTy* gpl = t->getPathList();
 
-		//t->ShowFunctionList();
-		t->ShowNonRFL();
-
-		
 		PathList m_PathList(gpl);
 		m_PathList.ShowPathList();
 	
@@ -125,9 +130,6 @@ int main(int argc, char *argv[]) {
 		Checker checker(&brp, &arg);
 		checker.CheckerRunsOnPathList(&m_PathList);
 		
-		//brp.showBugLocation();
-
-
 	}
 
 

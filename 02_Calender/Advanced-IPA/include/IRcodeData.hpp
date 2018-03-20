@@ -49,6 +49,9 @@ public:
 	bool isPathUncountedFunction(const std::string&);
 
 public:
+	IPA::SymbolManager* getSymbolManager();
+
+public:
 
 	IRcodeData(std::unique_ptr<Module> &m, IPA::SymbolManager& sm);
 	~IRcodeData();

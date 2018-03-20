@@ -45,6 +45,32 @@ bool PathList::ShowPathList(){
 	return true;
 }
 
+/*
+
+   Analysis Manger required
+
+bool PathList::ShowPathList(const char* dat){
+
+	std::list<Path *>::iterator iter1;
+	
+	std::ofstream fout;
+	fout.open(dat, std::ofstream::out | std::ofstream::app);
+
+	for(iter1 = PathListPtr->begin(); iter1 != PathListPtr->end(); iter1++){ 
+
+		Path *current_path = (*iter1);
+
+		fout << "Path" << *(current_path->getName()) << " ";
+		current_path->ShowPath(fout);
+		fout << std::endl << std::endl;
+	}
+
+	fout.close();
+
+	return true;
+}
+
+*/
 
 /* class Path */
 
@@ -299,10 +325,9 @@ bool Path::ShowPath(std::ofstream& fout){
 		{
 			continue;
 		}
-		std::cout << " -> " << *(bb->getName());
 		fout << " -> " << *(bb->getName());
 	}
-	std::cout << std::endl;
+	fout << std::endl;
 
 	return true;
 }

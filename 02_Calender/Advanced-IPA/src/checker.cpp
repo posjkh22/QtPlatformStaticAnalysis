@@ -566,6 +566,14 @@ bool Checker::CheckerRunsOnBasicBlock(wBasicBlock *BB){
 		{
 			Checker_MemoryAllocationC(BB, currentInst); 
 		}
+		else if(getCheckerTy() == checker_ty::SemaphoreIntegrity)
+		{
+			Checker_BasicSemaphoreIntegrity(BB, currentInst);
+		}
+		else
+		{
+			std::cerr << "Undefined Checker" << std::endl;
+		}
 		
 	}
 

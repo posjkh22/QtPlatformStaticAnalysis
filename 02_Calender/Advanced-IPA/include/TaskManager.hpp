@@ -25,6 +25,7 @@ class TaskManager
 public:
 	TaskManager(ArgumentPass* arg, IRcodeData* IRcode);
 
+	bool Process();
 
 public:
 	TaskList *getTaskList();

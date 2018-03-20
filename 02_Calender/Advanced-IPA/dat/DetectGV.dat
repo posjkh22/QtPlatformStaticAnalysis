@@ -1,2 +1,3 @@
 var
-mutex_lock
+mutex_lock1
+mutex_lock2
