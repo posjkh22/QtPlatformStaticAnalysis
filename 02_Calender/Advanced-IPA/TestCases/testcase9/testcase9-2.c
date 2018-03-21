@@ -5,16 +5,28 @@
 pthread_mutex_t mutex_lock1;
 pthread_mutex_t mutex_lock2;
 
-int var = 1;
+int SharedResource1 = 1;
+int SharedResource2 = 1;
+
 
 void task1()
 {
 
 	pthread_mutex_lock(&mutex_lock1);
 
-	var++;
+	SharedResource1++;
 
 	pthread_mutex_unlock(&mutex_lock1);
+
+
+	pthread_mutex_lock(&mutex_lock2);
+
+	SharedResource2++;
+
+	pthread_mutex_unlock(&mutex_lock2);
+	pthread_mutex_unlock(&mutex_lock2);
+
+
 
 };
 
@@ -22,11 +34,15 @@ void task1()
 void task2()
 {
 
-	pthread_mutex_lock(&mutex_lock2);
 
-	var++;
+	SharedResource2++;
 
 	pthread_mutex_unlock(&mutex_lock2);
+	
+	pthread_mutex_lock(&mutex_lock1);
+
+	SharedResource1++;
+
 
 };
 

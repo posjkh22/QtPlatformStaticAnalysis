@@ -243,15 +243,17 @@ bool Task::DetermineSemaphoreVariableList()
 									/* empty */
 								}
 
-								if(FoundSemValFlag == false)
-								{
-									m_DSVL.push_back(semValue);
-								}
-								else
-								{
-									/* empty */
-								}
 							}
+							
+							if(FoundSemValFlag == false)
+							{
+								m_DSVL.push_back(semValue);
+							}
+							else
+							{
+								/* empty */
+							}
+						
 						}
 					
 					}
@@ -285,16 +287,17 @@ bool Task::DetermineSemaphoreVariableList()
 								{
 									/* empty */
 								}
-
-								if(FoundSemValFlag == false)
-								{
-									m_LSVL.push_back(semValue);
-								}
-								else
-								{
-									/* empty */
-								}
 							}
+
+							if(FoundSemValFlag == false)
+							{
+								m_LSVL.push_back(semValue);
+							}
+							else
+							{
+								/* empty */
+							}
+						
 						}
 					}
 
@@ -329,18 +332,19 @@ bool Task::DetermineSemaphoreVariableList()
 								{
 									/* empty */
 								}
+							}
 
-								if(FoundSemValFlag == false)
-								{
-									m_USVL.push_back(semValue);
-								}
-								else
+							if(FoundSemValFlag == false)
+							{
+								m_USVL.push_back(semValue);
+							}
+							else
 
-								{
-									/* empty */
-								}
+							{
+								/* empty */
 							}
 						}
+						
 					}
 
 

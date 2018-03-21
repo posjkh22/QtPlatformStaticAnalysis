@@ -1,6 +1,24 @@
 [Checker is running on Path [2]..]
-[No Error Code was Found] 
+[Checker: Error Detected]
+ - Double unlock(0x2480d68/-1/task2/1/-1)
+ - Directory: testcase9
+ - Finename: testcase9-2.c
+ - Line: 40
+ - BasicBlock: task2%0
+
+ - Not unlock(0x2480b98/1/task2/1/0)
+ - Directory: testcase9
+ - Finename: testcase9-2.c
+ - Line: 42
+ - BasicBlock: task2%1
+
 [Checker is running on Path [1]..]
-[No Error Code was Found] 
+[Checker: Error Detected]
+ - Double unlock(0x2480d68/-1/task1/1/1)
+ - Directory: testcase9
+ - Finename: testcase9-2.c
+ - Line: 27
+ - BasicBlock: task1%4
+
 [Checker is running on Path [0]..]
 [No Error Code was Found] 

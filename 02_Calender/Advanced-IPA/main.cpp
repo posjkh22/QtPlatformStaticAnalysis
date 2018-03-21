@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
 		PathListTy* gpl = t->getPathList();
 
 		PathList m_PathList(gpl);
-		m_PathList.ShowPathList();
+		//m_PathList.ShowPathList();
 	
 	
 		IPA::BugReport brp;

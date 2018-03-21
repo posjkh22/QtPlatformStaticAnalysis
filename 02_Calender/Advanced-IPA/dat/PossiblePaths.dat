@@ -1,9 +1,0 @@
-Path[2]  -> task2%0 -> pthread_mutex_lock%0 -> task2%1 -> pthread_mutex_unlock%0 -> task2%2
-
-
-Path[1]  -> task1%0 -> pthread_mutex_lock%0 -> task1%1 -> pthread_mutex_unlock%0 -> task1%2
-
-
-Path[0]  -> main%0 -> malloc%0 -> main%1 -> pthread_mutex_init%0 -> main%2 -> pthread_mutex_init%0 -> main%3 -> pthread_create%0 -> main%4 -> pthread_create%0 -> main%5 -> pthread_join%0 -> main%6 -> pthread_join%0 -> main%7
-
-

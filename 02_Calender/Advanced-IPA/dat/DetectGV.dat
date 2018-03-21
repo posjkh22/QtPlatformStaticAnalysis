@@ -1,3 +1,4 @@
-var
+SharedResource1
+SharedResource2
 mutex_lock1
 mutex_lock2

@@ -1,6 +1,6 @@
 #Task: main
 
 #Task: task1
-var 
+SharedResource1 SharedResource2 
 #Task: task2
-var 
+SharedResource2 SharedResource1 

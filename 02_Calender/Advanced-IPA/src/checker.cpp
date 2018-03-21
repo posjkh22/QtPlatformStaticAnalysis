@@ -344,7 +344,10 @@ bool Checker::BugReport(){
 	fout.open("./dat/FoundErrors.dat", std::ofstream::out | std::ofstream::app);
 
 	if(check_checker_state_flag() != 0 
-			&& ((getCheckerTy() == Checker::checker_ty::FilePointerAnalysisC) || (getCheckerTy() == Checker::checker_ty::MemoryAllocationC))){
+			&& ((getCheckerTy() == Checker::checker_ty::FilePointerAnalysisC) 
+				|| (getCheckerTy() == Checker::checker_ty::MemoryAllocationC)
+				|| (getCheckerTy() == Checker::checker_ty::SemaphoreIntegrity))){
+
 
 		std::cout << "[Checker: Error Detected]" << std::endl;
 		fout << "[Checker: Error Detected]" << std::endl;
@@ -364,6 +367,10 @@ bool Checker::BugReport(){
 				else if(getCheckerTy() == Checker::checker_ty::MemoryAllocationC){
 					std::cout << " - Improper free";
 					fout << " - Improper free";
+				}
+				else if(getCheckerTy() == Checker::checker_ty::SemaphoreIntegrity){
+					std::cout << " - Double unlock";
+					fout << " - Double unlock";
 				}
 				std::cout << "(" << current->traceVal << "/";
 				std::cout << *(current->checker_state_flag) << "/";
@@ -393,7 +400,7 @@ bool Checker::BugReport(){
 					&& current->bug_location_flag == 1) )
 			*/
 
-			if(( (*(current->checker_state_flag) > 0 
+			if(( (*(current->checker_state_flag) == 1 
 					&& current->bug_location_flag == 1) )
 				
 				){
@@ -405,6 +412,10 @@ bool Checker::BugReport(){
 				else if(getCheckerTy() == Checker::checker_ty::MemoryAllocationC){
 					std::cout << " - Allocated Memory is Not freed";
 					fout << " - Allocated Memory is Not freed";
+				}
+				else if(getCheckerTy() == Checker::checker_ty::SemaphoreIntegrity){
+					std::cout << " - Not unlock";
+					fout << " - Not unlock";
 				}
 				std::cout << "(" << current->traceVal << "/";
 				std::cout << *(current->checker_state_flag) << "/";
@@ -429,6 +440,39 @@ bool Checker::BugReport(){
 				fout << std::endl << std::endl;
 			}
 
+			if(( (*(current->checker_state_flag) > 1 
+					&& current->bug_location_flag == 1) )
+				
+				){
+
+				if(getCheckerTy() == Checker::checker_ty::SemaphoreIntegrity){
+					std::cout << " - Double lock";
+					fout << " - Double lock";
+				}
+				std::cout << "(" << current->traceVal << "/";
+				std::cout << *(current->checker_state_flag) << "/";
+				std::cout << current->f->getName().str() << "/";
+				std::cout << current->bug_location_flag << "/";
+				std::cout << current->unique_number;
+				std::cout << ")";
+				std::cout << std::endl;
+				
+				fout << "(" << current->traceVal << "/";
+				fout << *(current->checker_state_flag) << "/";
+				fout << current->f->getName().str() << "/";
+				fout << current->bug_location_flag << "/";
+				fout << current->unique_number;
+				fout << ")";
+				fout << std::endl;
+				
+				m_BugReport->AddBugLocation(current->Location);	
+				m_BugReport->showBugLocation(current->Location, fout);
+
+				fout << " - BasicBlock: " << *(current->LocationBB->getName());
+				fout << std::endl << std::endl;
+			}
+
+			
 		}
 
 	}
@@ -579,10 +623,6 @@ bool Checker::CheckerRunsOnBasicBlock(wBasicBlock *BB){
 
 	return true;
 }
-
-
-
-
 
 
 
