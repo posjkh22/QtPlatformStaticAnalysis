@@ -78,7 +78,9 @@ public:
 	bool detectGlobalVariables();
 	
 	bool showGlobalVariable();
+	bool showGlobalVariable(const char*);
 	bool showStaticVariable();
+	bool showStaticVariable(const char*);
 	bool FindStaticVariable();
 	bool FindGlobalVariable();
 

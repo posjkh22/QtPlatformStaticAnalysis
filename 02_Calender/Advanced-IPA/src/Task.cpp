@@ -17,8 +17,11 @@ bool Task::Process()
 	DetermineFunctionList();
 	DetermineNonRFL();
 	DetermineSemaphoreVariableList();
+	DetermineSharedResourcesList();
 	ShowNonRFL();
 	ShowNonRFL("./dat/NonReentrantFunctionList.dat");
+	ShowSRL();
+	ShowSRL("./dat/SharedResourcesList.dat");
 
 	return true;
 }
@@ -55,6 +58,93 @@ PathListTy* Task::getPathList()
 {
 	return m_pathList;
 }
+
+
+
+bool Task::DetermineSharedResourcesList()
+{
+
+	for(auto iter1 = m_FunctionList.begin();
+			iter1 != m_FunctionList.end(); iter1++)
+	{
+
+		wFunction* currentFunc = *iter1;
+		for(auto iter2 = currentFunc->getGlobalVariableList().begin();
+				iter2 != currentFunc->getGlobalVariableList().end(); iter2++)
+		{
+			llvm::GlobalVariable* currentGV= *iter2;
+
+			if(m_SRL.empty())
+			{
+				m_SRL.push_back(currentGV);	
+			}
+			else
+			{
+
+				bool GVFoundFlag = false;
+				for(auto iter3 = m_SRL.begin();
+						iter3 != m_SRL.end(); iter3++)
+				{
+					
+					if(currentGV == *iter3)
+					{
+						GVFoundFlag = true;
+						break;
+					}
+				}
+
+				if(GVFoundFlag == false)
+				{
+					m_SRL.push_back(currentGV);
+				}
+
+			}
+		}
+	}
+
+	for(auto iter1 = m_FunctionList.begin();
+			iter1 != m_FunctionList.end(); iter1++)
+	{
+
+		wFunction* currentFunc = *iter1;
+		for(auto iter2 = currentFunc->getStaticVariableList().begin();
+				iter2 != currentFunc->getStaticVariableList().end(); iter2++)
+		{
+			llvm::GlobalVariable* currentGV= *iter2;
+
+			if(m_SRL.empty())
+			{
+				m_SRL.push_back(currentGV);	
+			}
+			else
+			{
+
+				bool GVFoundFlag = false;
+				for(auto iter3 = m_SRL.begin();
+						iter3 != m_SRL.end(); iter3++)
+				{
+					
+					if(currentGV == *iter3)
+					{
+						GVFoundFlag = true;
+						break;
+					}
+				}
+
+				if(GVFoundFlag == false)
+				{
+					m_SRL.push_back(currentGV);
+				}
+
+			}
+		}
+	}
+
+
+
+	return true;
+}
+
 
 
 bool Task::DetermineSemaphoreVariableList()
@@ -435,6 +525,43 @@ bool Task::ShowNonRFL(const char* dat)
 	return true;
 }
 
+
+bool Task::ShowSRL()
+{
+	
+	std::cout << "Shared Resources in " << getTaskName() << std::endl;
+
+	for(auto iter1 = m_SRL.begin();
+			iter1 != m_SRL.end(); iter1++)
+	{
+		llvm::Value* currentGV = *iter1;
+		std::cout << currentGV->getName().str() << " ";
+
+	}
+	std::cout << std::endl;
+	std::cout << std::endl;
+	
+	return true;
+}
+
+bool Task::ShowSRL(const char* dat)
+{
+	std::ofstream fout;
+	fout.open(dat, std::ofstream::out | std::ofstream::app);
+	
+	fout << "#Task: " << getTaskName() << std::endl;
+
+	for(auto iter1 = m_SRL.begin();
+			iter1 != m_SRL.end(); iter1++)
+	{
+		llvm::Value* currentCV = *iter1;
+		fout << currentCV->getName().str() << " ";
+	}
+	fout << std::endl;
+	fout.close();
+	
+	return true;
+}
 
 
 /*

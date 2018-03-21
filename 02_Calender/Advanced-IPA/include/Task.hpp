@@ -16,6 +16,7 @@ class Path;
 namespace IPA
 {
 
+typedef std::list<llvm::Value* > SharedResourcesListTy;
 typedef std::list<wFunction* > FunctionListTy;
 typedef std::list<wFunction* > NonRetrantFunctionListTy;
 typedef wFunction EntryFunctionTy;
@@ -61,15 +62,18 @@ private:
 	SemaphoreValueListTy m_DSVL;
 	SemaphoreValueListTy m_LSVL;
 	SemaphoreValueListTy m_USVL;
+	SharedResourcesListTy m_SRL;
 
 public:
 	bool DetermineFunctionList();
 	bool DetermineNonRFL();
 	bool DetermineSemaphoreVariableList();
+	bool DetermineSharedResourcesList();
 	bool ShowFunctionList();
 	bool ShowNonRFL();
 	bool ShowNonRFL(const char*);
-
+	bool ShowSRL();
+	bool ShowSRL(const char*);
 
 };
 
