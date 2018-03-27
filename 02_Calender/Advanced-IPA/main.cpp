@@ -23,6 +23,7 @@
 #include "TaskManager.hpp"
 #include "BugReport.hpp"
 #include "SymbolManager.hpp"
+#include "Visualize.hpp"
 
 /* 2018-01-25 */
 
@@ -113,6 +114,12 @@ int main(int argc, char *argv[]) {
 	am.run();
 	*/
 
+	/* Graph */
+	IPA::Visualize v;
+	v.setVisualizePolicy(new IPA::Graphviz());
+	v.Setup();
+	
+	//v.run();		
 
 	for(unsigned int i = 0; i < tm.getTaskNum(); i++)
 	{

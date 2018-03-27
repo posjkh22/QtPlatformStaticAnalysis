@@ -76,6 +76,7 @@ link: result_clean
 	$(LIB)/PathImpl.o \
 	$(LIB)/checker.o \
 	$(LIB)/BugReport.o \
+	$(LIB)/Visualize.o \
 	$(CHECKER_LIB)/MemoryAllocationC.o \
 	$(CHECKER_LIB)/Semaphore.o \
 	$(CHECKER_LIB)/Checker1.o \
@@ -101,6 +102,7 @@ all: clean \
 		pathImpl \
 		checker \
 		BugReport \
+		Visualize \
 		CheckerList 
 	clang++ -std=c++11 \
 	$(LIB)/main.o \
@@ -118,6 +120,7 @@ all: clean \
 	$(LIB)/PathImpl.o \
 	$(LIB)/checker.o \
 	$(LIB)/BugReport.o \
+	$(LIB)/Visualize.o \
 	$(CHECKER_LIB)/MemoryAllocationC.o \
 	$(CHECKER_LIB)/Semaphore.o \
 	$(CHECKER_LIB)/Checker1.o \
@@ -231,6 +234,13 @@ BugReport:
 	-I$(INCLUDE) \
 	`llvm-config --cxxflags`
 
+Visualize:
+	clang++ -std=c++11 \
+	-c $(SRC)/Visualize.cpp \
+	-o $(LIB)/Visualize.o \
+	-I$(INCLUDE) \
+	`llvm-config --cxxflags`
+	
 clean:
 	rm -f $(OUTPUT) test_out $(LIB)/*.o Analysis*
 
