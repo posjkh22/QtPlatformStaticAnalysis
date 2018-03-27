@@ -18,6 +18,7 @@ bool Task::Process()
 	DetermineNonRFL();
 	DetermineSemaphoreVariableList();
 	DetermineSharedResourcesList();
+	ShowFunctionList("./dat/TaskFunctionList.dat");
 	ShowNonRFL();
 	ShowNonRFL("./dat/NonReentrantFunctionList.dat");
 	ShowSRL();
@@ -485,10 +486,56 @@ bool Task::ShowFunctionList()
 		//std::cout << currentFunc->getName() << " ";
 		std::cout << currentFunc->getFunction()->getName().str() << " ";
 
-
 	}
 	std::cout << std::endl;
 
+	return true;
+}
+
+bool Task::ShowFunctionList(const char* dat)
+{
+	std::ofstream fout;
+	fout.open(dat, std::ofstream::out | std::ofstream::app);
+	fout << "#" << getTaskName() << std::endl;
+	
+	for(auto iter = m_FunctionList.begin();
+			iter != m_FunctionList.end(); iter++)
+	{		
+		wFunction* currentFunc = *iter;
+
+		bool PUFL_found_flag = false;
+		for(auto iter2 = p_symbolManager->getPUFL().begin(); 
+				iter2 != p_symbolManager->getPUFL().end(); iter2++)
+		{
+			std::string comp_string = **iter2;	
+		
+			if(comp_string == currentFunc->getName())
+			{
+				PUFL_found_flag = true;
+			}
+			else
+			{
+				/* empty */
+			}
+		}
+
+		if(getTaskName() == currentFunc->getName())
+		{
+			PUFL_found_flag = true;
+		}
+		else
+		{
+			/* empty */
+		}
+		if(PUFL_found_flag == true)
+		{
+			continue;
+		}
+		fout << currentFunc->getName() << " ";
+	}
+	fout << std::endl;
+
+	fout.close();
 	return true;
 }
 
@@ -515,7 +562,7 @@ bool Task::ShowNonRFL(const char* dat)
 	std::ofstream fout;
 	fout.open(dat, std::ofstream::out | std::ofstream::app);
 	
-	fout << "#Task: " << getTaskName() << std::endl;
+	fout << "#" << getTaskName() << std::endl;
 
 	for(auto iter1 = m_NonRFL.begin();
 			iter1 != m_NonRFL.end(); iter1++)
@@ -553,7 +600,7 @@ bool Task::ShowSRL(const char* dat)
 	std::ofstream fout;
 	fout.open(dat, std::ofstream::out | std::ofstream::app);
 	
-	fout << "#Task: " << getTaskName() << std::endl;
+	fout << "#" << getTaskName() << std::endl;
 
 	for(auto iter1 = m_SRL.begin();
 			iter1 != m_SRL.end(); iter1++)

@@ -1,0 +1,6 @@
+#main
+
+#task1
+shared_func1 t1_fnc1 shared_func2 
+#task2
+shared_func1 shared_func2 t2_fnc1 

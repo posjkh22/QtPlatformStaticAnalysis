@@ -5,8 +5,8 @@ CHECKER_LIB		=./lib
 LIB				=./lib
 INCLUDE			=./include
 TESTCASE		= ./TestCases
-TESTCLASS 		= testcase9
-TEST			= testcase9-2
+TESTCLASS 		= testcase8
+TEST			= testcase8-1
 TARGET_OPTION 	= --target=Linux
 THREAD_OPTION1	= --thread=Unithread
 THREAD_OPTION2	= --thread=Multithread

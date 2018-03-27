@@ -115,12 +115,20 @@ int main(int argc, char *argv[]) {
 	*/
 
 	/* Graph */
-	IPA::Visualize v;
-	v.setVisualizePolicy(new IPA::Graphviz());
-	v.Setup();
-	
-	//v.run();		
+	IPA::Visualize v1(
+			new IPA::Graphviz(), 
+			"./dat/SharedResourcesList.dat",
+			"./dat/TaskSharedResources.dot");
+	v1.Setup();
+	v1.run();		
 
+	IPA::Visualize v2(
+			new IPA::Graphviz(), 
+			"./dat/TaskFunctionList.dat",
+			"./dat/TaskFunction.dot");
+	v2.Setup();
+	v2.run();		
+	
 	for(unsigned int i = 0; i < tm.getTaskNum(); i++)
 	{
 

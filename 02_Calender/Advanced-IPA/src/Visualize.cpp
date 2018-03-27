@@ -5,8 +5,14 @@
 
 using namespace IPA;
 
+Visualize::Visualize(VisualizationPolicy* policy, const char* src, const char* dot)
+	: p_policy(policy), p_src(src), p_dot(dot) 
+{
 
-bool Visualize::setVisualizePolicy(VisualizationPolicy* new_policy)
+}
+
+
+bool Visualize::ChangeVisualizePolicy(VisualizationPolicy* new_policy)
 {
 	if(p_policy == nullptr)
 	{
@@ -23,7 +29,7 @@ bool Visualize::setVisualizePolicy(VisualizationPolicy* new_policy)
 
 bool Visualize::run()
 {
-	p_policy->activate("./dat/SharedResourcesList.dat");
+	p_policy->activate(p_dot);
 
 	return true;
 }
@@ -31,8 +37,15 @@ bool Visualize::run()
 bool Visualize::Setup()
 {
 	
-	p_policy->apply_input_value("./dat/resource_graph.dot");
+	p_policy->apply_input_value(p_src);
 
+	return true;
+}
+
+bool Visualize::debug()
+{
+
+	p_policy->debug_show_input_value();
 	return true;
 }
 
@@ -43,15 +56,19 @@ bool Graphviz::apply_input_value(const char* dat)
 	fin.open(dat, std::ifstream::in);
 
 	#define STRING_SIZE 128
-	char inputString[STRING_SIZE];
+	//char inputString[STRING_SIZE];
+	std::string inputString;
 	std::string* p_inputString;
 
 	while(!fin.eof())
 	{	
-		fin.getline(inputString, STRING_SIZE);
+		fin >> inputString;
+		//fin.getline(inputString, STRING_SIZE);
 		p_inputString = new std::string(inputString);
 		input_value_list.push_back(p_inputString);
 	}
+
+	input_value_list.pop_back();
 
 	#undef STRING_SIZE
 	
@@ -81,51 +98,85 @@ bool Graphviz::activate(const char* dat)
 
 	fout << "digraph Resource {" << std::endl;	
 
+	fout << "node [shape=circle, width=1.7]; ";
+	for(auto iter = input_value_list.begin();
+		iter != input_value_list.end(); iter++)
+	{
+		bool redundant_flag = false;
+		for(auto iter1 = iter;
+				iter1 != input_value_list.end(); )
+		{
+			iter1++;
+
+			if(*iter == *iter1)
+			{
+				redundant_flag = true;
+			}
+		}
+		if(redundant_flag == true)
+		{
+			continue;
+		}
+		
+		std::string currentString(**iter);
+		if(currentString.at(0) == '#')
+		{
+			fout << " " << "\"" << currentString.substr(1) << "\"" << ";";
+		
+		}
+
+	}
+	fout << std::endl;
+
 	fout << "node [shape=box]; ";
 	for(auto iter = input_value_list.begin();
 		iter != input_value_list.end(); iter++)
 	{	
+
+		bool redundant_flag = false;
+		for(auto iter1 = iter;
+				iter1 != input_value_list.end(); )
+		{
+			iter1++;
+			if(*iter == *iter1)
+			{
+				redundant_flag = true;
+			}
+		}
+		if(redundant_flag == true)
+		{
+			continue;
+		}
+
+		std::string currentString(**iter);
+		if(currentString.at(0) != '#')
+		{	
+			fout << " " << "\"" << currentString << "\"" << ";";
+		}	
+	}
+	fout << std::endl;
+
+	std::string processString;
+	for(auto iter = input_value_list.begin();
+		iter != input_value_list.end(); iter++)
+	{	
+
 		std::string currentString(**iter);
 		if(currentString.at(0) == '#')
-		{
-			fout << " " << currentString << ";";
-		
-		}
-
-	}
-
-	fout << "node [shape=circle, fixedsize=true, width=0.9]; ";
-	for(auto iter = input_value_list.begin();
-		iter != input_value_list.end(); iter++)
-	{	
-
-		std::string currentString(**iter);
-		if(currentString.at(0) != '#')
 		{	
-			fout << " " << currentString << ";";
-		}
-	
-	}
-
-	for(auto iter = input_value_list.begin();
-		iter != input_value_list.end(); iter++)
-	{	
-
-		std::string currentString(**iter);
-		std::string processString;
-		if(currentString.at(0) != '#')
-		{	
-			processString = currentString;
+			processString = currentString.substr(1);
 		
 		}
 		else
 		{	
-			fout << processString << "->";
-			fout << currentString << ";" << std::endl;
+			fout << "\"" << processString << "\"" << "->";
+			fout << "\"" << currentString << "\"" << ";";
 		}
-
+		fout << std::endl;
 
 	}
+	fout << std::endl;
+	fout << "}";
 	fout.close();
 	return true;
 }

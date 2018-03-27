@@ -1,7 +1,5 @@
-SharedResource1
-SharedResource2
-SharedResource3
-SharedResource4
-SharedResource5
-mutex_lock1
-mutex_lock2
+IntegerGlobalVariable
+DoubleGlobalVariable
+charGlobal1
+IntegerPointerGV
+charGlobal2

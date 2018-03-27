@@ -74,6 +74,7 @@ public:
 	bool DetermineSemaphoreVariableList();
 	bool DetermineSharedResourcesList();
 	bool ShowFunctionList();
+	bool ShowFunctionList(const char*);
 	bool ShowNonRFL();
 	bool ShowNonRFL(const char*);
 	bool ShowSRL();
