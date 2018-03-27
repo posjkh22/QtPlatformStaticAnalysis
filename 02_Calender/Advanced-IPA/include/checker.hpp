@@ -16,6 +16,7 @@
 #include "PathImpl.hpp"
 #include "BugReport.hpp"
 #include "ArgumentPass.hpp"
+#include "Task.hpp"
 
 using namespace llvm;
 
@@ -25,10 +26,13 @@ class wInstruction;
 class Path;
 class PathList;
 
+namespace IPA{
+	class Task;
+};
 
 extern GlobalVariable *comp_gv;
 
-
+typedef std::list<Value* > ValueListTy;
 
 
 class Checker
@@ -125,6 +129,10 @@ public:
 private:
 	IPA::BugReport *m_BugReport;
 	IPA::ArgumentPass *m_ArgumentPass;
+	IPA::Task* p_Task;
+
+public:
+	ValueListTy* p_SRL;
 
 private:
 	checker_ty m_CheckerType;
@@ -145,7 +153,9 @@ private:
 
 
 public:
-	Checker(IPA::BugReport *bugReport, IPA::ArgumentPass *argument);
+	Checker(IPA::BugReport*, 
+			IPA::ArgumentPass*,
+			IPA::Task*);
 	Checker(PathList *);
 	Checker(Path *);
 

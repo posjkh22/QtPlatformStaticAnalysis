@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
 	
 		IPA::BugReport brp;
 
-		Checker checker(&brp, &arg);
+		Checker checker(&brp, &arg, t);
 		checker.CheckerRunsOnPathList(&m_PathList);
 		
 	}

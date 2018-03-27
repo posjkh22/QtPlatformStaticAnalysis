@@ -44,9 +44,6 @@ bool Checker::Checker_BasicSemaphoreIntegrity(wBasicBlock *BB, wInstruction *Ins
 				new_trace_data->bug_location_flag = 1;
 				new_trace_data->unique_number = -1;
 				traceValState.push_back(new_trace_data);
-				
-				std::cout << "UnLock without Lock: " << SemVal->getName().str() << std::endl;
-				ShowTraceData();
 
 			}
 
@@ -144,8 +141,8 @@ bool Checker::Checker_BasicSemaphoreIntegrity(wBasicBlock *BB, wInstruction *Ins
 					*(get_trace_data->checker_state_flag) += 1;
 					get_trace_data->bug_location_flag = 1;
 
-					std::cout << "Double Lock2: " << SemVal->getName().str() << std::endl;
-					ShowTraceData();
+					std::cout << "Double Lock" << std::endl;
+
 				}
 
 			}
@@ -161,103 +158,8 @@ bool Checker::Checker_BasicSemaphoreIntegrity(wBasicBlock *BB, wInstruction *Ins
 		/* empty */
 	}
 
-	if(trace_flag == 0)
-	{
-		llvm::Instruction* bare_inst = Inst->getInstruction();
-
-		/* Before starting trace, if there is improper free instruction */
-		if(Inst->getInstruction()->getOpcodeName() == std::string("call"))
-		{		
-			
-			llvm::Instruction *bare_inst = Inst->getInstruction();
-			Value *get_opnd 
-				= bare_inst->getOperand(bare_inst->getNumOperands() - 1);			
-			
-			/* if free is found */
-			if(get_opnd->getName().str() == std::string("pthread_mutex_unlock"))
-			{
-		
-				#define SEM_VAL 0
-			
-				llvm::Value* SemVal = bare_inst->getOperand(SEM_VAL);
-				Value* traceVal = reinterpret_cast<llvm::Value* >(SemVal);
-				
-				TraceData* returnIterPtr
-					= SearchTraceVal(traceVal);
-				
-				/* if not locked SemVal */
-				
-				*(returnIterPtr->checker_state_flag) -= 1;
-				
-				std::cout << "UnLock1: " << SemVal->getName().str() << std::endl;
-				ShowTraceData();
-				
-			
-				/* Double Unlock */
-				if( *(returnIterPtr->checker_state_flag) < 0)
-				{
-					returnIterPtr->LocationBB = BB;
-					returnIterPtr->Location = bare_inst;
-					returnIterPtr->bug_location_flag = 1;
-				}
-
-
-
-				#undef SEM_VAL
-			
-
-			}
-		}
-
-		/* Function Retrun Value does not need to be considered */
-		else if(bare_inst->getOpcodeName() == std::string("ret"))
-		{
-		
-			llvm::Function* fid = BB->getParentFunction();
-
-			if(fid->getName().str() == "main"
-					|| fid->getName().str() == "task1"
-					|| fid->getName().str() == "task2"
-			  )
-			{
-				setBugLocationFlag(fid);
-				std::cout << "[Return phase]" << std::endl;
-				ShowTraceData();
-
-				if(p_SRL->empty())
-				{
-					/* empty */
-				}
-				else
-				{
-					std::cout << "Not protected SharedResources: ";
-					for(auto iter1 = p_SRL->begin();
-							iter1 != p_SRL->end(); iter1++)
-					{
-						llvm::Value* currentVar = *iter1;
-						std::cout <<" " <<  currentVar->getName().str();
-					}
-					std::cout << std::endl;
-				}
-			}
-			else
-			{
-				/* empty*/
-				/* No demand for deleteTraceValwithReturn(fid) */
-				/* SemVal is all global Value */
-			}
-		}
-		
-		else
-		{
-			/* empty */
-		}
-		
-
-	}
-
-
-	if(trace_flag >= 1)
+	
+	if(trace_flag == 1)
 	{
 
 		llvm::Instruction* bare_inst = Inst->getInstruction();
@@ -286,22 +188,6 @@ bool Checker::Checker_BasicSemaphoreIntegrity(wBasicBlock *BB, wInstruction *Ins
 				setBugLocationFlag(fid);
 				std::cout << "[Return phase]" << std::endl;
 				ShowTraceData();
-
-				if(p_SRL->empty())
-				{
-					/* empty */
-				}
-				else
-				{
-					std::cout << "Not protected SharedResources: ";
-					for(auto iter1 = p_SRL->begin();
-							iter1 != p_SRL->end(); iter1++)
-					{
-						llvm::Value* currentVar = *iter1;
-						std::cout <<" " <<  currentVar->getName().str();
-					}
-					std::cout << std::endl;
-				}
 			}
 			else
 			{
@@ -360,21 +246,18 @@ bool Checker::Checker_BasicSemaphoreIntegrity(wBasicBlock *BB, wInstruction *Ins
 					new_trace_data->bug_location_flag = 1;
 					new_trace_data->unique_number = -1;
 					traceValState.push_back(new_trace_data);
-	
+		
 					std::cout << "UnLock2: " << SemVal->getName().str() << std::endl;
 					ShowTraceData();
 				}
 
 				else
 				{
-					/* Proper Unlock Case */
 					*(returnIterPtr->checker_state_flag) -= 1;
 					
 					std::cout << "UnLock1: " << SemVal->getName().str() << std::endl;
 					ShowTraceData();
-					trace_flag -= 1;
-				
-					/* Double Unlock */
+					
 					if( *(returnIterPtr->checker_state_flag) < 0)
 					{
 						returnIterPtr->LocationBB = BB;
@@ -399,94 +282,10 @@ bool Checker::Checker_BasicSemaphoreIntegrity(wBasicBlock *BB, wInstruction *Ins
 
 		}
 
-		else if( bare_inst->getOpcodeName() == std::string("load") 
-				|| bare_inst->getOpcodeName() == std::string("bitcast") 
-
-			   )
+		else
 		{
-
-			#define LOADED_VALUE 0
-			Value* sharedVar = bare_inst->getOperand(LOADED_VALUE);			
-
-			for(auto iter1 = p_SRL->begin();
-					iter1 != p_SRL->end(); )
-			{
-				Value* SharedResource = *iter1;
-				if(sharedVar == SharedResource)
-				{
-					p_SRL->erase(iter1++);		
-				}
-				else
-				{
-					iter1++;
-				}
-			}
-
+			/* empty */	
 		}
-		
-		else if(bare_inst->getOpcodeName() == std::string("store"))
-		{		
-			#define STORED_VALUE 0
-			#define STORAGE 1
-		
-			Value* sharedVar = bare_inst->getOperand(STORAGE);
-			
-			for(auto iter1 = p_SRL->begin();
-					iter1 != p_SRL->end(); )
-			{
-				Value* SharedResource = *iter1;
-				if(sharedVar == SharedResource)
-				{
-					p_SRL->erase(iter1++);		
-				}
-				else
-				{
-					iter1++;
-				}
-			}
-
-		}	
 	}
-
-	/* if trace_flag < 0 */
-	/*
-	
-	else if(trace_flag == 0)
-	{
-		if(Inst->getInstruction()->getOpcodeName() == std::string("call"))
-		{		
-			
-			llvm::Instruction *bare_inst = Inst->getInstruction();
-			Value *get_opnd 
-				= bare_inst->getOperand(bare_inst->getNumOperands() - 1);			
-			
-			if(get_opnd->getName().str() == std::string("pthread_mutex_unlock")){
-		
-		
-				#define SEM_VAL 0	
-				llvm::Value* SemVal = bare_inst->getOperand(SEM_VAL);
-				Value* traceVal = reinterpret_cast<llvm::Value* >(SemVal);
-				
-				TraceData* returnIterPtr
-					= SearchTraceVal(traceVal);
-		
-				*(returnIterPtr->checker_state_flag) -= 1;	
-				std::cout << "Double UnLock: " << SemVal->getName().str() << std::endl;
-				ShowTraceData();
-				trace_flag -= 1;
-			
-				if( *(returnIterPtr->checker_state_flag) < 0)
-				{
-					returnIterPtr->LocationBB = BB;
-					returnIterPtr->Location = bare_inst;
-					returnIterPtr->bug_location_flag = 1;
-				}
-				#undef SEM_VAL
-
-			}
-		}
-
-	}
-	*/
 	return true;
 }

@@ -4,3 +4,15 @@
 SharedResource1 SharedResource2 
 #Task: task2
 SharedResource2 SharedResource1 
+#Task: main
+
+#Task: task1
+SharedResource1 SharedResource2 SharedResource5 SharedResource3 SharedResource4 
+#Task: task2
+SharedResource2 SharedResource1 SharedResource3 SharedResource4 SharedResource5 
+#Task: main
+
+#Task: task1
+SharedResource1 SharedResource2 SharedResource5 SharedResource3 SharedResource4 
+#Task: task2
+SharedResource2 SharedResource1 SharedResource3 SharedResource4 SharedResource5 

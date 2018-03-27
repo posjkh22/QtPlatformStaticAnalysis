@@ -1,24 +1,78 @@
 [Checker is running on Path [2]..]
 [Checker: Error Detected]
- - Double unlock(0x2480d68/-1/task2/1/-1)
+ - Improper unlock(0x2749df8/-1/task2/1/-1)
  - Directory: testcase9
  - Finename: testcase9-2.c
- - Line: 40
+ - Line: 41
  - BasicBlock: task2%0
 
- - Not unlock(0x2480b98/1/task2/1/0)
+ - Not unlock(0x2749c28/1/task2/1/0)
  - Directory: testcase9
  - Finename: testcase9-2.c
- - Line: 42
+ - Line: 43
  - BasicBlock: task2%1
 
 [Checker is running on Path [1]..]
 [Checker: Error Detected]
- - Double unlock(0x2480d68/-1/task1/1/1)
+ - Not unlock(0x2749c28/1/task1/1/0)
  - Directory: testcase9
  - Finename: testcase9-2.c
- - Line: 27
- - BasicBlock: task1%4
+ - Line: 15
+ - BasicBlock: task1%0
+
+ - Improper unlock(0x2749df8/-1/task1/1/1)
+ - Directory: testcase9
+ - Finename: testcase9-2.c
+ - Line: 28
+ - BasicBlock: task1%5
+
+[Checker is running on Path [0]..]
+[No Error Code was Found] 
+[Checker is running on Path [2]..]
+[Checker: Error Detected]
+ - Improper unlock(0xcadd38/-1/task2/1/-1)
+ - Directory: testcase9
+ - Finename: testcase9-2.c
+ - Line: 48
+ - BasicBlock: task2%0
+
+[Checker is running on Path [1]..]
+[Checker: Error Detected]
+ - Not unlock(0xcadb68/1/task1/1/0)
+ - Directory: testcase9
+ - Finename: testcase9-2.c
+ - Line: 18
+ - BasicBlock: task1%0
+
+ - Improper unlock(0xcadd38/-1/task1/1/1)
+ - Directory: testcase9
+ - Finename: testcase9-2.c
+ - Line: 33
+ - BasicBlock: task1%5
+
+[Checker is running on Path [0]..]
+[No Error Code was Found] 
+[Checker is running on Path [2]..]
+[Checker: Error Detected]
+ - Improper unlock(0x15d2d38/-1/task2/1/-1)
+ - Directory: testcase9
+ - Finename: testcase9-2.c
+ - Line: 48
+ - BasicBlock: task2%0
+
+[Checker is running on Path [1]..]
+[Checker: Error Detected]
+ - Not unlock(0x15d2b68/1/task1/1/0)
+ - Directory: testcase9
+ - Finename: testcase9-2.c
+ - Line: 18
+ - BasicBlock: task1%0
+
+ - Improper unlock(0x15d2d38/-1/task1/1/1)
+ - Directory: testcase9
+ - Finename: testcase9-2.c
+ - Line: 33
+ - BasicBlock: task1%5
 
 [Checker is running on Path [0]..]
 [No Error Code was Found] 

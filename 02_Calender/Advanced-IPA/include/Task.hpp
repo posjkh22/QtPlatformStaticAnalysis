@@ -7,6 +7,7 @@
 #include "wBasicBlock.hpp"
 #include "PathImpl.hpp"
 #include "Path.hpp"
+#include "checker.hpp"
 
 class wFunction;
 class wBasicBlock;
@@ -28,6 +29,8 @@ typedef std::list<Path *> PathListTy;
 
 class Task
 {
+public:
+	friend class Checker;
 
 private:
 	IPA::SymbolManager* p_symbolManager;
@@ -62,6 +65,7 @@ private:
 	SemaphoreValueListTy m_DSVL;
 	SemaphoreValueListTy m_LSVL;
 	SemaphoreValueListTy m_USVL;
+public:
 	SharedResourcesListTy m_SRL;
 
 public:

@@ -4,16 +4,23 @@
 
 //#define DEBUG_CHECKER				
 
-Checker::Checker(IPA::BugReport *bugReport, IPA::ArgumentPass *argument)
+Checker::Checker(
+		IPA::BugReport *bugReport, 
+		IPA::ArgumentPass *argument,
+		IPA::Task* task)
 {
-	trace_flag = 0;
+	trace_flag = -1;
 	trace_new_func_flag = 0;
 	basic_checker_state_flag = 0;
 	reset_flag = 1;
+
+	p_SRL = new ValueListTy(task->m_SRL);
+	
 	//checker_state_flag = 0;
 	//traceVal = nullptr;
 	m_BugReport = bugReport;
 	m_ArgumentPass = argument;
+	p_Task = task;
 
 	checkerTyDetermination();
 };
@@ -369,8 +376,8 @@ bool Checker::BugReport(){
 					fout << " - Improper free";
 				}
 				else if(getCheckerTy() == Checker::checker_ty::SemaphoreIntegrity){
-					std::cout << " - Double unlock";
-					fout << " - Double unlock";
+					std::cout << " - Improper unlock";
+					fout << " - Improper unlock";
 				}
 				std::cout << "(" << current->traceVal << "/";
 				std::cout << *(current->checker_state_flag) << "/";

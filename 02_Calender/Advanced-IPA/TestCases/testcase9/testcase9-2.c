@@ -7,14 +7,19 @@ pthread_mutex_t mutex_lock2;
 
 int SharedResource1 = 1;
 int SharedResource2 = 1;
+int SharedResource3 = 1;
+int SharedResource4 = 1;
+int SharedResource5 = 1;
 
 
 void task1()
 {
 
 	pthread_mutex_lock(&mutex_lock1);
+	pthread_mutex_lock(&mutex_lock1);
 
 	SharedResource1++;
+	SharedResource2++;
 
 	pthread_mutex_unlock(&mutex_lock1);
 
@@ -22,11 +27,14 @@ void task1()
 	pthread_mutex_lock(&mutex_lock2);
 
 	SharedResource2++;
+	SharedResource5++;
 
 	pthread_mutex_unlock(&mutex_lock2);
 	pthread_mutex_unlock(&mutex_lock2);
 
 
+	SharedResource3++;
+	SharedResource4++;
 
 };
 
@@ -43,6 +51,11 @@ void task2()
 
 	SharedResource1++;
 
+	SharedResource1++;
+	SharedResource3++;
+	pthread_mutex_unlock(&mutex_lock1);
+	SharedResource4++;
+	SharedResource5++;
 
 };
 
