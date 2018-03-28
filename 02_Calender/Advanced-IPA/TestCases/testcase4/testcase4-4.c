@@ -1,31 +1,14 @@
 /* No error Case */
 
-typedef struct file {
+#include <stdio.h>
 
-	int a;
-
-}FILE;
 
 int a = 0;
-FILE g_file;
 
-FILE *fopen(char *in, char *mod);
-void fclose(FILE *in);
 void fnc1(FILE* fin1, FILE* fin2);
 void fnc2(FILE* fin1, FILE* fin2);
 void fnc3(FILE *fin2);
 
-FILE *fopen(char *in, char *mod){
-
-	a++;
-
-	return &g_file;
-}
-
-void fclose(FILE *in){
-
-	a--;
-}
 
 void fnc3(FILE *fin2){
 

@@ -5,11 +5,12 @@ CHECKER_LIB		=./lib
 LIB				=./lib
 INCLUDE			=./include
 TESTCASE		= ./TestCases
-TESTCLASS 		= testcase8
-TEST			= testcase8-1
+TESTCLASS 		= testcase9
+TEST			= testcase9-1
 TARGET_OPTION 	= --target=Linux
 THREAD_OPTION1	= --thread=Unithread
 THREAD_OPTION2	= --thread=Multithread
+ANALYSIS_OPTION0	= --analysis=FilePointerAnalysisC
 ANALYSIS_OPTION1	= --analysis=MemoryAllocationC
 ANALYSIS_OPTION2	= --analysis=SemaphoreIntegrity
 
@@ -17,12 +18,26 @@ test:
 	make -C ./TestCases
 
 run: all
-	./$(OUTPUT) $(TESTCASE)/$(TESTCLASS)/$(TEST).bc $(TARGET_OPTION) $(THREAD_OPTION2) $(ANALYSIS_OPTIOIN2)
+	./$(OUTPUT) $(TESTCASE)/$(TESTCLASS)/$(TEST).bc $(TARGET_OPTION) $(THREAD_OPTION1) $(ANALYSIS_OPTIOIN2)
 
 run2: 
-	./$(OUTPUT) $(TESTCASE)/$(TESTCLASS)/$(TEST).bc $(TARGET_OPTION) $(THREAD_OPTION2) $(ANALYSIS_OPTION2)
+	./$(OUTPUT) $(TESTCASE)/$(TESTCLASS)/$(TEST).bc $(TARGET_OPTION) $(THREAD_OPTION1) $(ANALYSIS_OPTION2)
 
-CheckerList: c1 c2 c3 c4 c5
+
+R1:
+	./$(OUTPUT) $(TESTCASE)/testcase4/testcase4-4.bc $(TARGET_OPTION) $(THREAD_OPTION1) $(ANALYSIS_OPTION0)
+
+R2:
+	./$(OUTPUT) $(TESTCASE)/testcase8/testcase8-1.bc $(TARGET_OPTION) $(THREAD_OPTION2) $(ANALYSIS_OPTION1)
+
+R3:
+	./$(OUTPUT) $(TESTCASE)/testcase9/testcase9-2.bc $(TARGET_OPTION) $(THREAD_OPTION2) $(ANALYSIS_OPTION2)
+
+
+CheckerList: c1 c2 c3 \
+		FilePointerAnalysisC \
+		MemoryAllocationC \
+		Semaphore 
 
 c1:
 	clang++ -std=c++11 \
@@ -42,13 +57,19 @@ c3:
 	-o $(LIB)/Checker3.o \
 	-I$(INCLUDE) \
 	`llvm-config --cxxflags`
-c4:	
+FilePointerAnalysisC:	
+	clang++ -std=c++11 \
+	-c $(CHECKER_SRC)/FilePointerAnalysisC.cpp \
+	-o $(LIB)/FilePointerAnalysisC.o \
+	-I$(INCLUDE) \
+	`llvm-config --cxxflags`
+MemoryAllocationC:	
 	clang++ -std=c++11 \
 	-c $(CHECKER_SRC)/MemoryAllocationC.cpp \
 	-o $(LIB)/MemoryAllocationC.o \
 	-I$(INCLUDE) \
 	`llvm-config --cxxflags`
-c5:	
+Semaphore:	
 	clang++ -std=c++11 \
 	-c $(CHECKER_SRC)/Semaphore.cpp \
 	-o $(LIB)/Semaphore.o \
@@ -77,6 +98,7 @@ link: result_clean
 	$(LIB)/checker.o \
 	$(LIB)/BugReport.o \
 	$(LIB)/Visualize.o \
+	$(CHECKER_LIB)/FilePointerAnalysisC.o \
 	$(CHECKER_LIB)/MemoryAllocationC.o \
 	$(CHECKER_LIB)/Semaphore.o \
 	$(CHECKER_LIB)/Checker1.o \

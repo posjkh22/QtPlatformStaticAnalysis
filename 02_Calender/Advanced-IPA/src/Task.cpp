@@ -17,11 +17,14 @@ bool Task::Process()
 	DetermineFunctionList();
 	DetermineNonRFL();
 	DetermineSemaphoreVariableList();
+	//ShowSemaphoreVariableList();
+	ShowSemaphoreVariableList("./dat/TaskSemValList.dat");
 	DetermineSharedResourcesList();
+	//ShowFunctionList();
 	ShowFunctionList("./dat/TaskFunctionList.dat");
-	ShowNonRFL();
+	//ShowNonRFL();
 	ShowNonRFL("./dat/NonReentrantFunctionList.dat");
-	ShowSRL();
+	//ShowSRL();
 	ShowSRL("./dat/SharedResourcesList.dat");
 
 	return true;
@@ -147,11 +150,88 @@ bool Task::DetermineSharedResourcesList()
 }
 
 
+bool Task::ShowSemaphoreVariableList()
+{
+
+	std::cout << "SemVal Analysis in " <<  getTaskName() << std::endl;
+	for(auto iter = m_DSVL.begin();
+			iter != m_DSVL.end(); iter++)
+	{
+		std::cout << "Defined SemValue: " << (*iter)->getName().str() << std::endl;
+	}
+	for(auto iter = m_LSVL.begin();
+			iter != m_LSVL.end(); iter++)
+	{
+		std::cout << "Lock SemValue: " << (*iter)->getName().str() << std::endl;
+	}
+	for(auto iter = m_USVL.begin();
+			iter != m_USVL.end(); iter++)
+	{
+		std::cout << "Unlock SemValue: " << (*iter)->getName().str() << std::endl;
+	}
+
+	if(m_DSVL.empty())
+	{
+		std::cout << "Defined SemValue: None" << std::endl;
+	}
+	if(m_LSVL.empty())
+	{
+		std::cout << "Locked SemValue: None" << std::endl;
+	}
+	if(m_USVL.empty())
+	{
+		std::cout << "Unlocked SemValue: None" << std::endl;
+	}
+
+	std::cout << std::endl;
+
+	return true;
+}
+
+bool Task::ShowSemaphoreVariableList(const char* dat)
+{
+
+	std::ofstream fout;
+	fout.open(dat, std::ofstream::out | std::ofstream::app);
+
+	fout << "#" <<  getTaskName() << std::endl;
+	for(auto iter = m_DSVL.begin();
+			iter != m_DSVL.end(); iter++)
+	{
+		fout << "D:" << (*iter)->getName().str() << std::endl;
+	}
+	for(auto iter = m_LSVL.begin();
+			iter != m_LSVL.end(); iter++)
+	{
+		fout << "L:" << (*iter)->getName().str() << std::endl;
+	}
+	for(auto iter = m_USVL.begin();
+			iter != m_USVL.end(); iter++)
+	{
+		fout << "U:" << (*iter)->getName().str() << std::endl;
+	}
+
+	if(m_DSVL.empty())
+	{
+		fout << "D:None" << std::endl;
+	}
+	if(m_LSVL.empty())
+	{
+		fout << "L:None" << std::endl;
+	}
+	if(m_USVL.empty())
+	{
+		fout << "U:None" << std::endl;
+	}
+
+	fout << std::endl;
+
+	return true;
+}
 
 bool Task::DetermineSemaphoreVariableList()
 {
 
-	std::cout << "SemVal Analysis in " <<  getTaskName() << std::endl;
 
 
 	for(auto iter1 = m_pathList->begin();
@@ -219,7 +299,6 @@ bool Task::DetermineSemaphoreVariableList()
 					if(calleeF->getName().str() == std::string("pthread_mutex_init"))
 					{
 						llvm::Value* semValue = currentInst.getOperand(0);
-						std::cout << "Defined SemValue: " << semValue->getName().str() << std::endl;
 
 
 						if(m_DSVL.empty())
@@ -264,7 +343,6 @@ bool Task::DetermineSemaphoreVariableList()
 					if(calleeF->getName().str() == std::string("pthread_mutex_lock"))
 					{
 						llvm::Value* semValue = currentInst.getOperand(0);
-						std::cout << "Locked SemValue: " << semValue->getName().str() << std::endl;
 
 
 						if(m_LSVL.empty())
@@ -306,7 +384,6 @@ bool Task::DetermineSemaphoreVariableList()
 					if(calleeF->getName().str() == std::string("pthread_mutex_unlock"))
 					{
 						llvm::Value* semValue = currentInst.getOperand(0);
-						std::cout << "Unlocked SemValue: " << semValue->getName().str() << std::endl;
 
 
 						if(m_USVL.empty())
@@ -357,22 +434,6 @@ bool Task::DetermineSemaphoreVariableList()
 
 	}
 
-	if(m_DSVL.empty())
-	{
-		std::cout << "Defined SemValue: None" << std::endl;
-	}
-	if(m_LSVL.empty())
-	{
-		std::cout << "Locked SemValue: None" << std::endl;
-	}
-	if(m_USVL.empty())
-	{
-		std::cout << "Unlocked SemValue: None" << std::endl;
-	}
-
-
-
-	std::cout << std::endl;
 
 	return true;
 }
@@ -390,7 +451,12 @@ bool Task::DetermineFunctionList()
 		{
 			wBasicBlock* currentBasicBlock = *iter2;	
 			wFunction* parentFunction = currentBasicBlock->getParent();	
-		
+	
+			if(parentFunction->getName() == std::string("llvm.dbg.declare"))
+			{
+				continue;
+			}
+
 			if(m_FunctionList.empty())
 			{
 				m_FunctionList.push_back(parentFunction);
@@ -473,17 +539,14 @@ bool Task::DetermineNonRFL()
 
 bool Task::ShowFunctionList()
 {
-#ifdef TASK_DEBUG
 	std::cout << "Function" << std::endl;
 	std::cout << "Num: " << m_FunctionList.size() << std::endl;
-#endif
 
 
 	for(auto iter1 = m_FunctionList.begin();
 			iter1 != m_FunctionList.end(); iter1++)
 	{
 		wFunction* currentFunc = *iter1;
-		//std::cout << currentFunc->getName() << " ";
 		std::cout << currentFunc->getFunction()->getName().str() << " ";
 
 	}

@@ -613,6 +613,10 @@ bool Checker::CheckerRunsOnBasicBlock(wBasicBlock *BB){
 		{
 			check4(BB, currentInst); 
 		}
+		else if(getCheckerTy() == checker_ty::FilePointerAnalysisC)
+		{
+			Checker_FilePointerAnalysisC(BB, currentInst);
+		}
 		else if(getCheckerTy() == checker_ty::MemoryAllocationC)
 		{
 			Checker_MemoryAllocationC(BB, currentInst); 

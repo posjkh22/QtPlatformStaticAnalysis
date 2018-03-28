@@ -74,12 +74,17 @@ int main(int argc, char *argv[]) {
 	arg.processArguPass(argc, argv);
 	arg.showArgument();
 
+	std::cout << "--------------Argu analysis done----------------" << std::endl;
+
 	/* IRParser */
 	StringRef filename = argv[argc-1];
 	LLVMContext context;
 	SMDiagnostic error;
 	std::unique_ptr<Module> m = parseIRFile(filename, error, context);
+
 	
+	std::cout << "-------------IR Parse analysis done-------------" << std::endl;
+
 	/* Wrapper */
 	IRcodeData IRcode(m, sm);
 
@@ -96,6 +101,8 @@ int main(int argc, char *argv[]) {
 	
 	IRcode.Preprocess0();
 	
+	std::cout << "---------------Pre-analysis done----------------" << std::endl;
+	
 /*
 	IRcode.DebugWrapperModule();	
 */
@@ -107,6 +114,8 @@ int main(int argc, char *argv[]) {
 	/* TaskManager */
 	IPA::TaskManager tm(&arg, &IRcode);
 	tm.Process();
+	
+	std::cout << "---------------Task-analysis done---------------" << std::endl;
 
 	/* Analysis Manager */
 	/*
@@ -128,6 +137,8 @@ int main(int argc, char *argv[]) {
 			"./dat/TaskFunction.dot");
 	v2.Setup();
 	v2.run();		
+	
+	std::cout << "------------------Visualize done----------------" << std::endl;
 	
 	for(unsigned int i = 0; i < tm.getTaskNum(); i++)
 	{
